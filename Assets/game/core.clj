@@ -7,9 +7,15 @@
     game.vr
     repl.parser)
   (:require
+    arcadia.repl
     [clojure.string :as string]))
 
 (defonce repl (atom nil))
+(def repl-env (atom (arcadia.repl/env-map)))
+(def prompt  (atom 0))
+(def histidx (atom 0))
+(def ns-str  (atom "user=>"))
+(def history (atom []))
 
 (defn text [o] (.text (child-component o UnityEngine.TextMesh)))
 (defn text! [o s] (set! (.text (child-component o UnityEngine.TextMesh)) s))
@@ -51,11 +57,24 @@
     (v3* (v3 x (+ (- lc y) 0.1) 0)
          0.098))))
 
-
+(defn eval-repl [o]
+  (let [form (state o :text)
+        {:keys [result env]} (arcadia.repl/repl-eval-print @repl-env form)]
+    (when-not (#{"" (last @history)} form)
+      (swap! history conj form))
+    (reset! histidx -1)
+    (reset! repl-env env)
+    (text! (state o :ns-obj) (str (ns-name (:*ns* @repl-env))))
+    (text! (state o :publics-obj) 
+      (apply str (interpose "\n" (keys (ns-publics (:*ns* @repl-env))))))
+    (set-state! o :text (str form "\n" result))
+    (reset! prompt (count (state o :text)))))
 
 (defn init-repl [o]
   (set-state! o :cursor 0)
   (set-state! o :cursor-obj (child-named o "cursor"))
+  (set-state! o :ns-obj (child-named o "ns"))
+  (set-state! o :publics-obj (child-named o "publics"))
   (update-cursor o))
 
 (defn mallet-enter [o c]
@@ -66,6 +85,8 @@
         (case f
           :back (update-state! @repl :text #(subs % 0 (max 0 (dec (count %)))))
           :enter (update-state! @repl :text #(str % "\n"))
+          :clear (set-state! @repl :text "")
+          :eval (eval-repl @repl)
           nil)
         (update-state! @repl :text #(str % chr)))
       (repl-display @repl)
@@ -93,6 +114,9 @@
 (defn mallets! []
   (on-hand (left) (init-mallet (clone! :mallet) (left)))
   (on-hand (right) (init-mallet (clone! :mallet) (right))))
+
+
+
 
 
 (defn start [o]
