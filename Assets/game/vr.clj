@@ -5,9 +5,15 @@
     [clojure.string :as string])
   (:import 
     [UnityEngine]
+    [Valve.VR EVRButtonId]
     SteamVR_ControllerManager
     SteamVR_TrackedController
-    ClickedEventHandler))
+    ClickedEventHandler
+    SteamVR_Controller))
+
+(defn haptic [i] 
+  (.TriggerHapticPulse (SteamVR_Controller/Input i) (ushort 1000) 
+  EVRButtonId/k_EButton_SteamVR_Touchpad))
 
 (defonce ^:private delegate-registry (atom {}))
 
