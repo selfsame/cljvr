@@ -16,6 +16,7 @@
 (def histidx (atom 0))
 (def ns-str  (atom "user=>"))
 (def history (atom []))
+(def shift (atom false))
 
 (defn text [o] (.text (child-component o UnityEngine.TextMesh)))
 (defn text! [o s] (set! (.text (child-component o UnityEngine.TextMesh)) s))
@@ -34,8 +35,8 @@
 
 (defn add-ball [s e]
   (let [b (clone! :ball (>v3 (gobj s)))]
-    (material-color! b (color 1 0 0))
-    (destroy b 10.0)))
+    (material-color! b (color 0 1 1))
+    (destroy b 20.0)))
 
 (defn repl-display [o]
   (text! (the repl) (parse (str (state o :text)))))
@@ -77,16 +78,23 @@
   (set-state! o :publics-obj (child-named o "publics"))
   (update-cursor o))
 
+(defn toggle-shift [down]
+  (reset! shift down)
+  (if down
+    (dorun (map #(text! % (str (state % :shift-key))) (every key)))
+    (dorun (map #(text! % (str (state % :key))) (every key)))))
+
 (defn mallet-enter [o c]
   (let [ko (.gameObject c)
         kt (gobj (.GetComponentInChildren ko UnityEngine.TextMesh))]
-    (when-let [chr (state ko :key)]
+    (when-let [chr (state ko (if @shift :shift-key :key))]
       (if-let [f (state ko :f)]
         (case f
           :back (update-state! @repl :text #(subs % 0 (max 0 (dec (count %)))))
           :enter (update-state! @repl :text #(str % "\n"))
           :clear (set-state! @repl :text "")
           :eval (eval-repl @repl)
+          :shift (toggle-shift true)
           nil)
         (update-state! @repl :text #(str % chr)))
       (repl-display @repl)
@@ -100,6 +108,10 @@
   (let [ko (.gameObject c)
         kt (gobj (.GetComponentInChildren ko UnityEngine.TextMesh))]
     (when-let [chr (state ko :key)]
+      (if-let [f (state ko :f)]
+        (case f
+          :shift (toggle-shift false)
+          nil))
       (timeline*
         (tween {:local {:scale (v3 1)}
                 :text {:color (color 1 1 1 0.25)}} kt 0.1)))))
@@ -116,19 +128,39 @@
   (on-hand (right) (init-mallet (clone! :mallet) (right))))
 
 
+(defn toggle-repl [s e]
+  (if @repl 
+    (do 
+      (dorun (map destroy (every mallet)))
+      (timeline* 
+        (tween {:local {:scale (v3 0)}} @repl 0.6 :pow3)
+        #(do 
+          (reset! repl (destroy @repl)) nil)))
+    (do (reset! repl (clone! :repl))
+        (init-repl @repl)
+        (eval-repl @repl)
+        (set-state! @repl :text "")
+        (mallets!)
+        (let [rs (local-scale @repl)]
+          (local-scale! @repl (v3 0))
+          (timeline*
+            (tween {:local {:scale rs}} @repl 0.6 :pow3))))))
 
-
+(defn empty-2 [s e])
 
 (defn start [o]
+  (reset! repl nil)
   (destroy-immediate (the camera-rig))
   (clear-cloned!)
   (clone! :sun)
   (clone! :grid)
   (clone! :camera-rig)
-  (reset! repl (clone! :repl))
-  (init-repl @repl)
-  (mallets!)
-  (hand+ (right) :trigger-clicked #'add-ball))
+  ;(hand+ (left) :trigger-clicked #'add-ball)
+  (dorun (map 
+    #(do 
+      (hand+ % :steam-clicked #'empty-2)
+      (hand+ % :menu-button-clicked #'toggle-repl))
+    [(left)(right)])))
 
 
 
