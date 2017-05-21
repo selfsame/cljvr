@@ -3,35 +3,48 @@
 	{
 		"selected_items":
 		[
+			[
+				"cursor",
+				"cursor-obj"
+			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "Assets/game/core.clj",
+			"file": "Assets/game/vr.clj",
 			"settings":
 			{
-				"buffer_size": 1342,
+				"buffer_size": 1696,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "Searching 60 files for \"camel\"\n\nC:\\dev\\unity\\cljvr\\Assets\\Arcadia\\Source\\arcadia\\core.clj:\n    2    (:require [clojure.string :as string]\n    3              [arcadia.internal.messages :refer [messages interface-messages]]\n    4:             [arcadia.internal.name-utils :refer [camels-to-hyphens]]\n    5              arcadia.literals)\n    6    (:import ArcadiaBehaviour\n    .\n  366  \n  367  (defn- message-keyword [m]\n  368:   (-> m str camels-to-hyphens string/lower-case keyword))\n  369  \n  370  (def hook-types\n\nC:\\dev\\unity\\cljvr\\Assets\\Arcadia\\Source\\arcadia\\internal\\name_utils.clj:\n    2    (:require [clojure.string :as string]))\n    3  \n    4: (defn camels-to-hyphens [s]\n    5    (string/replace s #\"([a-z])([A-Z])\" \"$1-$2\"))\n    6  \n\n3 matches across 2 files\n",
+			"file": "Assets/game/core.clj",
 			"settings":
 			{
-				"buffer_size": 770,
-				"line_ending": "Windows",
-				"name": "Find Results",
-				"scratch": true
+				"buffer_size": 5857,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Assets/Arcadia/Source/arcadia/internal/name_utils.clj",
+			"file": "Assets/repl/core.clj",
 			"settings":
 			{
-				"buffer_size": 379,
+				"buffer_size": 3105,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/game/todo.clj",
+			"settings":
+			{
+				"buffer_size": 133,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "(ns game.todo)"
 			}
 		},
 		{
@@ -44,10 +57,10 @@
 			}
 		},
 		{
-			"contents": "game.core=> ",
+			"contents": "\nnil\r\nuser=> \n#'game.core/toggle-repl\r\ngame.core=> \n#'game.core/toggle-repl\r\ngame.core=> \n#'game.core/toggle-repl\r\ngame.core=> \n#unity/GameObject -7994\r\ngame.core=> ",
 			"settings":
 			{
-				"buffer_size": 12,
+				"buffer_size": 165,
 				"line_ending": "Windows",
 				"name": "*arcadia-repl*",
 				"scratch": true
@@ -95,20 +108,19 @@
 	"expanded_folders":
 	[
 		"/C/dev/unity/cljvr/Assets",
-		"/C/dev/unity/cljvr/Assets/Arcadia",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Source",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia/internal",
-		"/C/dev/unity/cljvr/Assets/game",
-		"/C/dev/unity/cljvr/Assets/hard",
-		"/C/dev/unity/cljvr/Assets/shaders",
-		"/C/dev/unity/cljvr/Assets/SteamVR",
-		"/C/dev/unity/cljvr/Assets/SteamVR/Extras",
-		"/C/dev/unity/cljvr/Assets/SteamVR/Scripts",
-		"/C/dev/unity/cljvr/Assets/tween"
+		"/C/dev/unity/cljvr/Assets/repl"
 	],
 	"file_history":
 	[
+		"/C/dev/unity/cljvr/arcadia.sublime-project",
+		"/C/dev/unity/cljvr/Assets/hard/core.clj",
+		"/C/dev/unity/cljvr/Assets/SteamVR/Scripts/SteamVR_TestController.cs",
+		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia/core.clj",
+		"/C/dev/unity/cljvr/Assets/repl/core.clj",
+		"/C/dev/unity/cljvr/.gitignore",
+		"/C/dev/unity/cljvr/Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
+		"/C/dev/unity/cljvr/Assets/shaders/vertex-shadow-diffuse.shader",
+		"/C/dev/unity/pelatra/pelatra_latest/Assets/workout1.json",
 		"/C/dev/Arcadia/README.md",
 		"/C/Users/selfsame/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
 		"/C/dev/unity/cljvr/Assets/tween/core.clj",
@@ -123,6 +135,7 @@
 		"height": 109.0,
 		"where_history":
 		[
+			"C:\\dev\\unity\\cljvr\\Assets\\SteamVR",
 			"C:\\dev\\unity\\cljvr\\Assets\\Arcadia\\Source\\arcadia"
 		]
 	},
@@ -131,6 +144,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Haptic",
+			"HapticsOnTouch",
+			"EVRButtonId.k_EButton_SteamVR",
+			"k_EButton_SteamVR_Touchpad",
+			"EVRButtonId",
+			"Device",
+			"find-component",
 			"camel"
 		],
 		"highlight": true,
@@ -154,116 +174,125 @@
 			[
 				{
 					"buffer": 0,
-					"file": "Assets/game/core.clj",
+					"file": "Assets/game/vr.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1342,
+						"buffer_size": 1696,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1342,
-								1342
+								966,
+								966
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 90.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Assets/game/core.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5857,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5857,
+								5857
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2352.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Assets/repl/core.clj",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 3105,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								297,
+								297
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
+					"buffer": 3,
+					"file": "Assets/game/todo.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 770,
-						"regions":
-						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										278,
-										283
-									],
-									[
-										437,
-										442
-									],
-									[
-										659,
-										664
-									]
-								],
-								"scope": ""
-							}
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"detect_indentation": false,
-							"line_numbers": false,
-							"output_tag": 1,
-							"result_base_dir": "",
-							"result_file_regex": "^([^ \t].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "Assets/Arcadia/Source/arcadia/internal/name_utils.clj",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 379,
+						"buffer_size": 133,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								71,
-								44
+								133,
+								133
 							]
 						],
 						"settings":
 						{
+							"auto_name": "(ns game.todo)",
 							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
 					"semi_transient": false,
 					"settings":
@@ -275,8 +304,8 @@
 						"selection":
 						[
 							[
-								311,
-								311
+								933,
+								945
 							]
 						],
 						"settings":
@@ -289,7 +318,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -299,19 +328,19 @@
 			"sheets":
 			[
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12,
+						"buffer_size": 165,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12,
-								12
+								165,
+								165
 							]
 						],
 						"settings":
@@ -324,10 +353,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 76.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -366,7 +395,7 @@
 		"rows":
 		[
 			0.0,
-			0.823674248588,
+			0.824046925233,
 			1.0
 		]
 	},
@@ -409,7 +438,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 1,
+	"selected_group": 0,
 	"settings":
 	{
 	},
@@ -417,7 +446,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 244.0,
+	"side_bar_width": 144.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

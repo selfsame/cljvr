@@ -7,7 +7,7 @@
 using UnityEngine;
 using Valve.VR;
 
-[RequireComponent(typeof(Camera))]
+//[RequireComponent(typeof(Camera))]
 public class SteamVR_UpdatePoses : MonoBehaviour
 {
 #if !(UNITY_5_6)
