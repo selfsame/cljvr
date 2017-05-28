@@ -11,6 +11,8 @@
     ClickedEventHandler
     SteamVR_Controller))
 
+(defn controller [c] (SteamVR_Controller/Input (.controllerIndex c)))
+
 (defn haptic [i] 
   (.TriggerHapticPulse (SteamVR_Controller/Input i) (ushort 1000) 
   EVRButtonId/k_EButton_SteamVR_Touchpad))
@@ -57,3 +59,21 @@
 (defn left  [] (get-hand :left))
 (defn right [] (get-hand :right))
 
+(defn trigger-axis [c]
+  (.GetAxis (controller c) Valve.VR.EVRButtonId/k_EButton_SteamVR_Trigger))
+
+(defn haptic! [c] 
+  (.TriggerHapticPulse (controller c) (ushort 3000) 
+  EVRButtonId/k_EButton_SteamVR_Touchpad))
+
+'[MenuButtonClicked
+  MenuButtonUnclicked
+  TriggerClicked
+  TriggerUnclicked
+  SteamClicked
+  PadClicked
+  PadUnclicked
+  PadTouched
+  PadUntouched
+  Gripped
+  Ungripped]
