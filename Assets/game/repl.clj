@@ -20,7 +20,6 @@
 (def shift (atom false))
 
 (defn text [o] (.text (child-component o UnityEngine.TextMesh)))
-(defn text! [o s] (set! (.text (child-component o UnityEngine.TextMesh)) s))
 
 (deftween [:text :color] [this]
   {:base (.GetComponent this UnityEngine.TextMesh)

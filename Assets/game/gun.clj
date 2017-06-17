@@ -14,7 +14,7 @@
 (def colors [(color 1.0 0.0 0.0) (color 1.0 0.5586207 0.0) (color 0.0 0.6323529 0.03052744) (color 0.0 0.3793104 1.0) (color 0.6137934 0.0 1.0)])
 (def numbers (vec (range 1 10)))
 
-(defn suite! []
+(defn ^GameObject suite! []
   (let [shape (rand-nth shapes)
         c (rand-nth colors)
         n (rand-nth numbers)
@@ -26,7 +26,7 @@
       :number n})
     (set! (.name (parent! (clone! shape) mount)) "shape")
     (material-color! o c)
-    (text! (parent! (clone! :gun/number) mount) (str n))
+    (text! (parent! (clone! :gun/number) mount) (.ToString n))
     o))
 
 (defn destroy-ball [^GameObject o ^GameObject b]
@@ -50,9 +50,10 @@
       (destroy-ball (.gameObject (.collider h)) o)
       (destroy o))))
 
-(defn reload-gun! [o]
-  (let [s (suite!)]
-    (set! (.enabled (cmpt s UnityEngine.SphereCollider)) false)
+(defn reload-gun! [^GameObject o]
+  (let [^GameObject s (suite!)
+        ^UnityEngine.SphereCollider sc (.GetComponent s UnityEngine.SphereCollider)]
+    (set! (.enabled sc) false)
     (parent! s o)
     (set! (.localRotation (.transform s)) 
       (UnityEngine.Quaternion. -0.1979277 -0.0001618862 -0.0002829984 0.9802166))
@@ -61,9 +62,10 @@
 
 (defn fire-gun! [c e]
   (let [o (gobj c)
-        muzzle (child-named o "muzzle")
+        muzzle (direct-child-named o "raygun/muzzle")
         bullet (clone! :gun/bullet (>v3 muzzle))
-        s (child-named o "sphere")]
+        s (or (direct-child-named o "raygun/sphere")
+              (direct-child-named o "sphere"))]
     (set! (.rotation (.transform bullet))
           (.rotation (.transform muzzle)))
     (data! bullet (data s))
@@ -74,7 +76,7 @@
     (reload-gun! o)))
 
 (defn raygun! [hand] 
-  (if-let [model (child-named hand "Model")]
+  (if-let [model (child-named (gobj hand) "Model")]
     (.SetActive model false))
   (let [gun (clone! :gun/raygun)
         trigger (child-named gun "trigger")]

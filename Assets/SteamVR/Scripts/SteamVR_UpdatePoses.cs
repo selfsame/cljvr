@@ -13,7 +13,7 @@ public class SteamVR_UpdatePoses : MonoBehaviour
 #if !(UNITY_5_6)
 	void Awake()
 	{
-		var camera = GetComponent<Camera>();
+        var camera = Camera.main;// GetComponent<Camera>();
 		camera.stereoTargetEye = StereoTargetEyeMask.None;
 		camera.clearFlags = CameraClearFlags.Nothing;
 		camera.useOcclusionCulling = false;
