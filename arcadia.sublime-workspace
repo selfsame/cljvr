@@ -15,7 +15,7 @@
 			"file": "Assets/game/vr.clj",
 			"settings":
 			{
-				"buffer_size": 1696,
+				"buffer_size": 2208,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -24,43 +24,69 @@
 			"file": "Assets/game/core.clj",
 			"settings":
 			{
-				"buffer_size": 5857,
+				"buffer_size": 1275,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Assets/repl/core.clj",
+			"file": "Assets/game/snek.clj",
 			"settings":
 			{
-				"buffer_size": 3105,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Assets/game/todo.clj",
-			"settings":
-			{
-				"buffer_size": 133,
+				"buffer_size": 1009,
 				"encoding": "UTF-8",
-				"line_ending": "Windows",
-				"name": "(ns game.todo)"
-			}
-		},
-		{
-			"file": "Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
-			"settings":
-			{
-				"buffer_size": 8331,
-				"encoding": "UTF-8 with BOM",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "\nnil\r\nuser=> \n#'game.core/toggle-repl\r\ngame.core=> \n#'game.core/toggle-repl\r\ngame.core=> \n#'game.core/toggle-repl\r\ngame.core=> \n#unity/GameObject -7994\r\ngame.core=> ",
+			"file": "Assets/Arcadia/Source/arcadia/internal/state_help.clj",
 			"settings":
 			{
-				"buffer_size": 165,
+				"buffer_size": 1307,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/game/gun.clj",
+			"settings":
+			{
+				"buffer_size": 4291,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/hard/physics.clj",
+			"settings":
+			{
+				"buffer_size": 2426,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/hard/core.clj",
+			"settings":
+			{
+				"buffer_size": 10126,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/game/std.clj",
+			"settings":
+			{
+				"buffer_size": 2102,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "\n#object[Namespace 0xd5b68600 \"user\"]\r\nuser=> \nnil\r\nuser=> \nnil\r\ngame.core=> (set-state! (the Sphere) :foo #'add-ball)\nclojure.lang.Compiler+CompilerException: clojure.lang.CljCompiler.Ast.ParseException: Unable to resolve var: add-ball in this context\r\n  at clojure.lang.CljCompiler.Ast.TheVarExpr+Parser.Parse (clojure.lang.CljCompiler.Ast.ParserContext pcon, System.Object form) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.AnalyzeSeq (clojure.lang.CljCompiler.Ast.ParserContext pcon, ISeq form, System.String name) [0x00000] in <filename unknown>:0 , compiling: (NO_SOURCE_PATH:0:0)\n\n(1 stack frames omitted)\ngame.core=> \n#'game.core/add-ball\r\ngame.core=> (set-state! (the Sphere) :foo #'add-ball)\n{:foo #'game.core/add-ball}\r\ngame.core=> \nnil\r\ngame.core=> (state (the Sphere))\n{:foo #'game.core/add-ball}\r\ngame.core=> ",
+			"settings":
+			{
+				"buffer_size": 841,
 				"line_ending": "Windows",
 				"name": "*arcadia-repl*",
 				"scratch": true
@@ -108,17 +134,30 @@
 	"expanded_folders":
 	[
 		"/C/dev/unity/cljvr/Assets",
-		"/C/dev/unity/cljvr/Assets/repl"
+		"/C/dev/unity/cljvr/Assets/Arcadia",
+		"/C/dev/unity/cljvr/Assets/Arcadia/Components",
+		"/C/dev/unity/cljvr/Assets/Arcadia/Source",
+		"/C/dev/unity/cljvr/Assets/game",
+		"/C/dev/unity/cljvr/Assets/hard",
+		"/C/dev/unity/cljvr/Assets/repl",
+		"/C/dev/unity/cljvr/Assets/shaders",
+		"/C/dev/unity/cljvr/Assets/tween"
 	],
 	"file_history":
 	[
-		"/C/dev/unity/cljvr/arcadia.sublime-project",
+		"/C/dev/unity/cljvr/Assets/game/repl.clj",
+		"/C/dev/unity/cljvr/Assets/hard/mesh.clj",
+		"/C/dev/unity/cljvr/Assets/shaders/vertex.shader",
 		"/C/dev/unity/cljvr/Assets/hard/core.clj",
+		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia/internal/state_help.clj",
+		"/C/dev/unity/cljvr/Assets/SteamVR/Scripts/SteamVR_UpdatePoses.cs",
+		"/C/dev/unity/cljvr/Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
+		"/C/dev/unity/cljvr/Assets/game/todo.clj",
+		"/C/dev/unity/cljvr/arcadia.sublime-project",
 		"/C/dev/unity/cljvr/Assets/SteamVR/Scripts/SteamVR_TestController.cs",
 		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia/core.clj",
 		"/C/dev/unity/cljvr/Assets/repl/core.clj",
 		"/C/dev/unity/cljvr/.gitignore",
-		"/C/dev/unity/cljvr/Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
 		"/C/dev/unity/cljvr/Assets/shaders/vertex-shadow-diffuse.shader",
 		"/C/dev/unity/pelatra/pelatra_latest/Assets/workout1.json",
 		"/C/dev/Arcadia/README.md",
@@ -128,7 +167,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -144,6 +183,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"hand+",
+			"c2",
+			"Sin",
+			"gameobject?",
+			"EVRButtonId",
+			":+",
+			"material-color",
 			"Haptic",
 			"HapticsOnTouch",
 			"EVRButtonId.k_EButton_SteamVR",
@@ -169,7 +215,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -178,15 +224,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1696,
+						"buffer_size": 2208,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								966,
-								966
+								295,
+								295
 							]
 						],
 						"settings":
@@ -196,10 +242,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 84.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -208,45 +254,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5857,
+						"buffer_size": 1275,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5857,
-								5857
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2352.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "Assets/repl/core.clj",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 3105,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								297,
-								297
+								226,
+								226
 							]
 						],
 						"settings":
@@ -263,55 +279,56 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "Assets/game/todo.clj",
+					"buffer": 2,
+					"file": "Assets/game/snek.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 133,
+						"buffer_size": 1009,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								133,
-								133
+								182,
+								182
 							]
 						],
 						"settings":
 						{
-							"auto_name": "(ns game.todo)",
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "Assets/SteamVR/Extras/SteamVR_TrackedController.cs",
+					"buffer": 3,
+					"file": "Assets/Arcadia/Source/arcadia/internal/state_help.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8331,
+						"buffer_size": 1307,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								933,
-								945
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C#/C#.sublime-syntax",
-							"tab_size": 4,
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
@@ -319,6 +336,126 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Assets/game/gun.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4291,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								97,
+								97
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Assets/hard/physics.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2426,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								959,
+								959
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Assets/hard/core.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10126,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6059,
+								6059
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3902.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "Assets/game/std.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2102,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								365,
+								365
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -328,19 +465,19 @@
 			"sheets":
 			[
 				{
-					"buffer": 5,
+					"buffer": 8,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 165,
+						"buffer_size": 841,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								165,
-								165
+								841,
+								841
 							]
 						],
 						"settings":
@@ -353,10 +490,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 76.0,
+						"translation.y": 192.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -395,7 +532,7 @@
 		"rows":
 		[
 			0.0,
-			0.824046925233,
+			0.816305226462,
 			1.0
 		]
 	},
@@ -446,7 +583,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 144.0,
+	"side_bar_width": 187.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

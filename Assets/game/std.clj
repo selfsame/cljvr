@@ -12,7 +12,9 @@
     [UnityEngine GameObject Color]
     [Mathf]))
 
-(defn material-color! [o c] (set! (.color (.material (.GetComponent o UnityEngine.Renderer))) c))
+(defn material-color! [^UnityEngine.GameObject o ^UnityEngine.Color c] (set! (.color (.material (.GetComponent o UnityEngine.Renderer))) c))
+
+(defn text! [^UnityEngine.GameObject o ^System.String s] (set! (.text (cmpt o UnityEngine.TextMesh)) s))
 
 (defn on-hand [hand o]
   (parent! o (gobj hand))
