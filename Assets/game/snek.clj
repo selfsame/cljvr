@@ -6,37 +6,66 @@
     tween.core
     game.vr
     game.std)
-  (:import [UnityEngine GameObject]))
+  (:import [UnityEngine GameObject Quaternion Space]))
 
-(def direction (atom [0 0 1]))
-(def controlls (atom nil))
+
+(def snek (atom []))
+(def bodies (atom []))
+(def dirs (atom []))
+
+(defn update-game [o])
+
+(defn place-segment [i o]
+  (let [v (get @snek i)
+        d (get @dirs i)
+        front (direct-child-named o "snek-armature/front")
+        rear (direct-child-named o "snek-armature/rear")
+        v2 (get @snek (dec i) v)
+        d2 (get @dirs (dec i) d)]
+  (set! (.position (.transform front)) v)
+  (set! (.rotation (.transform front)) d)
+  (.Rotate (.transform front) (v3 90 0 0))
+  (set! (.position (.transform rear)) v2)
+  
+  (set! (.rotation (.transform rear)) d2)
+  (.Rotate (.transform rear) (v3 90 0 0))
+  ))
+
+(defn inc-snek []
+  (let [o (gobj (right))
+        needed (- (count @snek)(count @bodies))]
+    (swap! snek conj 
+      (v3+ (last @snek)
+        (v3* (.forward (.transform o)) 0.1)
+        ))
+    (swap! dirs conj (.rotation (.transform o)))
+    (if (pos? needed)
+      (dotimes [i needed] (swap! bodies conj (clone! :snek/snek))))
+    #_(if (neg? needed)
+      (dotimes [i (- needed)] (swap! bodies #(let [f (first %)] (destroy %) (vec (rest %))))))
+    (dorun
+      (map-indexed 
+        (fn [i o]
+          (place-segment i o))
+        @bodies))
+    (log "inc")
+    ))
 
 (defn start [o]
+  (reset! snek [(v3 0 0 -1)])
+  (reset! bodies [])
+  (reset! dirs [(Quaternion.)])
   (game.std/base-vr)
   (clone! :sun)
   (clone! :grid)
-  (reset! controlls (clone! :snek/controlls)))
-
-
-(defn hover [o c]
-  (timeline* (tween {:material {:color (color 0 1 0)}} o 0.2)))
-
-(defn unhover [o c]
-  (timeline* (tween {:material {:color (state o :color)}} o 0.2)))
-
-(defn control-click [o h]
-  (reset! direction (state o :dir))
-  (dorun (map #(set-state! % :color (color 1 1 1)) (children @controlls)))
-  (set-state! o :color (color 1 0 0))
-  (dorun (map #(timeline* (tween {:material {:color (state % :color)}} % 0.05))
-    (children @controlls))))
-
-'(set-state! (the down) :dir [0 -1 0])
-'(set-state! (the arrow) :on-trigger-exit #'unhover)
-
-'(map 
-  #(set-state! (object-named (str %)) :trigger-clicked #'control-click)
-  '[north south east west up down])
+  (let [session? (clone! :empty)]
+    (hook+ session? :update #'update-game)
+    (timeline* :loop
+      (wait 0.3)
+      #(if (null-obj? session?) (abort!))
+      #(inc-snek))))
 
 '(start nil)
+
+
 
