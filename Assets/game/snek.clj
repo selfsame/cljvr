@@ -8,20 +8,25 @@
     tween.core
     game.vr
     game.std)
-  (:import [UnityEngine GameObject Quaternion Space Mathf Mesh Vector3]))
+  (:import [UnityEngine GameObject Quaternion Space Mathf Mesh Vector3]
+    Curve))
 
-(def snek-cnt (atom 6))
-(defonce snek (atom []))
+(defn mesh! [o m] (set! (.mesh (.GetComponent o UnityEngine.MeshFilter)) m))
+
+(def snek-cnt (atom 7))
+(defonce VS (atom nil))
+(defonce DS (atom nil))
 (defonce head (atom nil))
 (defonce tail (atom nil))
+(defonce curve (atom nil))
 (def tube (atom nil))
-(defonce nothing (atom nil))
-(defonce bodies (atom []))
-(defonce dirs (atom []))
+
 (defonce tempo (atom 0))
 
+(def twopi (* Mathf/PI 2))
+
 (defn vert-ring [n r point dir]
-  (let [step (/ (* Mathf/PI 2) n)]
+  (let [step (/ twopi n)]
     (map 
       (fn [i]
         (let [u (* i step)]
@@ -29,95 +34,103 @@
             point
             (q* dir 
                 (v3 (* r (Mathf/Sin u))
-                    (* r (Mathf/Cos u)) 0)))))
+                    (* r (Mathf/Cos u)) 0.0)))))
       (range n))))
-
-; 3-4-5
-; |\|\|
-; 0-1-2
 
 (defn ring-tris [n i vs]
   (mapcat
     (fn [idx]
       (let [base (* n i)]
         (if (= idx (dec n))
-          [(+ base idx)(+ base)(+ base idx n)
-           (+ base idx n)(+ base)(+ base n)]
-          [(+ base idx)(+ base idx 1)(+ base idx n)
-           (+ base idx n)(+ base idx 1)(+ base idx n 1)])))
+          [(+ base idx)(+ base idx n)(+ base)
+           (+ base idx n)(+ base n)(+ base)]
+          [(+ base idx)(+ base idx n)(+ base idx 1)
+           (+ base idx n)(+ base idx n 1)(+ base idx 1)])))
     (range n)))
 
-(defn tube! [r n points dirs]
+(defn tube! [radius n points dirs]
   (let [s (count points)
         mesh (Mesh.)
-        vs (mapcat #(vert-ring n r (get points % (v3)) (get dirs % (Quaternion.))) (range s))
+        r (- 1 (* @tempo 3))
+
+        vs (mapcat 
+            #(let [;p1 (get points % (v3))
+                   ;p2 (get points (+ % 1) p1)
+                   ;p3 (get points (+ % 2) p2)
+                   ;p4 (get points (+ % 3) p3)
+                   d (get dirs (- s % 1) (Quaternion.))
+                   ;d2 (get dirs (- % 1) d)
+                   ;q (Quaternion/Lerp d d2 r)
+                   radius2 (* radius (.Evaluate (.curve (cmpt @curve Curve)) (float (/ % s))))
+                   ] 
+              (vert-ring n radius2 
+                (get points (- s % 1) (v3)) 
+                d )) 
+             (range s))
         ts (mapcat #(ring-tris n % vs) (range (dec s)))]
-      (set! (.vertices mesh) (into-array Vector3 vs))
-      (set! (.triangles mesh) (into-array System.Int32 ts))
+      (set! (.vertices mesh) (into-array Vector3 vs ))
+      (set! (.triangles mesh) (into-array System.Int32 ts ))
       (.RecalculateNormals mesh)
       mesh))
 
-(defn mesh! [o m] (set! (.mesh (.GetComponent o UnityEngine.MeshFilter)) m))
-
-'(mesh! (clone! :snek/tube) (tube! 0.1 8 12))
-
-
-
-
+(defn prime-snek [o]
+  (let [o (gobj o)
+        step (* 1 UnityEngine.Time/deltaTime)
+        cnt (* @snek-cnt 10)
+        vs (make-array Vector3 cnt)
+        rs (make-array Quaternion cnt)]
+    (dotimes [i cnt]
+      (aset vs i 
+        (v3+ (.position (.transform o))
+             (v3* (.forward (.transform o)) (* i (- step)))))
+      (aset rs i (.rotation (.transform o))))
+    [vs rs]))
+        
+(defn inc-snek []
+  (let [o (gobj (right))
+        cnt (* @snek-cnt 10)
+        step (* 0.5 UnityEngine.Time/deltaTime)
+        vs (make-array Vector3 cnt)
+        rs (make-array Quaternion cnt)]
+    (aset vs 0 
+      (v3+ (first @VS)
+           (v3* (.forward (.transform o)) step)))
+    (aset rs 0 (.rotation (.transform o)))
+    (dotimes [i (dec cnt)]
+      (aset vs (inc i) (get @VS i (last @VS)))
+      (aset rs (inc i) (get @DS i (last @DS))))
+    (reset! VS vs)
+    (reset! DS rs)))
 
 
 (defn snek-gizmos [o]
+  (gizmo-color (color 0 1 1))
+      (gizmo-point (first @VS) 0.05)
   (reduce 
     (fn [a b]
       (gizmo-color (color 1 0 1))
       (gizmo-point b 0.015)
       (gizmo-color (color 0 1 1))
       (gizmo-line a b) b)
-    @snek) )
+    @VS) )
+
+(defn every-nth [col n]
+  (vec (for [i (range (count col))
+        :when (= 0 (mod i n))
+        :let [v (get col i)]] v)))
 
 (defn tubesnek [o] 
-  (let [vs (reverse @snek)
-        ds (reverse @dirs)]
-    (mesh! o (tube! 0.05 12 (vec (take @snek-cnt vs)) (vec (take @snek-cnt ds)))) 
+  (let [vs (every-nth @VS 4)
+        ds (every-nth @DS 4)]
+    (mesh! o (tube! 0.05 6 vs ds)) 
     true))
 
 (defn place-snake [n]
-  (let [parts (vec (concat [@tail] @bodies [@head]))
-        vs (vec (take-last (inc n) @snek))
-        ds (vec (take-last (inc n) @dirs))]
+  (let []
+    (position! @head (first @VS))
+    (rotation! @head (first @DS))
     (tubesnek @tube)
-    (dorun
-      (for [i (reverse (range n))
-            :let [o (get parts i)
-                  o2 (get parts (dec i))
-                  v (get vs i)
-                  d (get ds i)
-                  front (direct-child-named o "snek-armature/front")
-                  rear (direct-child-named o "snek-armature/rear")
-                  va (get vs (dec i) v)
-                  vb (get vs (- i 2) va)
-                  vc (get vs (- i 3) vb)
-                  d2 (get ds (dec i) d)
-                  d3 (get ds (- i 2) d)
-                  r (- 1 (* @tempo 3))]]
-        (let [pos (spline r v va vb vc)
-              pos2 (spline (min (+ r 1) 1.0) v va vb vc)
-              q (Quaternion/Lerp d d2 r)
-              q2 (Quaternion/Lerp d2 d3 r)]
-          (set! (.position (.transform front)) pos)
-          (set! (.rotation (.transform front)) q)
-          (.Rotate (.transform front) (v3 90 0 0))
-          (if o2 
-            (do
-              (set! (.position (.transform rear)) 
-                    (.position (.transform (direct-child-named o2 "snek-armature/front"))))
-              (set! (.rotation (.transform rear))
-                    (.rotation (.transform (direct-child-named o2 "snek-armature/front")))))
-
-            (do  
-              (set! (.position (.transform rear)) pos2)
-              (set! (.rotation (.transform rear)) q2)
-              (.Rotate (.transform rear) (v3 90 0 0)))) )))))
+    ))
 
 (defn apple! []
   (let [apple (clone! :snek/apple (v3 (?f -1 1)(?f -1 1)(?f -1 1)))
@@ -126,58 +139,40 @@
 
 (defn update-game [o]
   (let [ro (gobj (right))]
-    (swap! snek update (dec (count @snek)) 
-      #(do %
-        (v3+ (get @snek (- (count @snek) 2))
-          (v3* (.forward (.transform ro)) 0.1))))
-    (swap! dirs update (dec (count @dirs)) 
-      #(do % (.rotation (.transform ro))))
+    (inc-snek)
+    (place-snake nil)
+    ))
 
-    (swap! tempo #(+ % UnityEngine.Time/deltaTime))
-    (if (>= (count @snek) @snek-cnt)
-        (place-snake @snek-cnt))))
 
-(defn inc-snek []
-  (let [o (gobj (right))]
-    (swap! snek conj 
-      (v3+ (last @snek)
-        (v3* (.forward (.transform o)) 0.1)))
-    (swap! dirs conj (.rotation (.transform o)))
-  (reset! tempo 0)) nil)
 
 (defn grow-snek []
-  (swap! snek-cnt inc)
-  (swap! bodies conj (clone! :snek/snek)))
+  (swap! snek-cnt inc))
 
 (defn snek-hit [o c]
   (let [thing (.gameObject c)]
     (cond (= (.name thing) "apple")
           (do (grow-snek)
-              (grow-snek)
               (apple!)
               (destroy thing)))))
 
 (defn start [o]
   (game.std/base-vr)
-  (reset! snek [(v3 0 0 -1)])
-  (reset! head (clone! :snek/snek-head))
-  (reset! tail (clone! :snek/snek-tail))
-  (reset! tube (clone! :snek/tube))
-  (reset! bodies (vec (for [i (range (- @snek-cnt 2))] (clone! :snek/snek))))
-  (reset! dirs [(Quaternion.)])
+  (let [[vs ds] (prime-snek (right))]
+    (reset! VS vs)
+    (reset! DS ds))
   (clone! :sun)
   (clone! :grid)
+  (clone! :skyball)
+  (reset! head (clone! :snek/snek-head))
+  (reset! tube (clone! :snek/tube))
+  (reset! curve (clone! :snek/curve))
+  (material-color! @tube (color 0.2745 0.6901 0.2196))
   (hook+ @head :on-trigger-enter #'snek-hit)
   (dotimes [i 10] (apple!))
   (let [session? (clone! :empty)]
     (hook+ session? :update #'update-game)
-    (hook+ session? :on-draw-gizmos #'snek-gizmos)
-    (timeline* :loop
-      (wait 0.3)
-      #(if (null-obj? session?) (abort!))
-      #(inc-snek)))
-(on-hand (right) (clone! :snek/minisnake))
-  )
+    (hook+ session? :on-draw-gizmos #'snek-gizmos))
+  (on-hand (right) (clone! :snek/minisnake)))
 
 (start nil)
 
