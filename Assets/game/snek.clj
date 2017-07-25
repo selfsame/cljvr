@@ -95,8 +95,8 @@
         ^UnityEngine.AnimationCurve curve (.curve (cmpt @curve Curve))]
     (dotimes [i tube-segments]
       (let [snake-idx (Mathf/Min (+ (* i 2) offset-idx) last-idx)
-            v (Hard.Helper/Aget vs snake-idx)
-            d (Hard.Helper/Aget ds snake-idx)
+            ^Vector3 v (Hard.Helper/Aget vs snake-idx)
+            ^Quaternion d (Hard.Helper/Aget ds snake-idx)
             radius (* 0.05 (.Evaluate curve (float (- 1.0 (/ snake-idx (.Length vs))))))]
       (dotimes [j segment-verts]
         (let [^System.Int64 idx (+ (* (- 9 i) 12) j)]
@@ -109,7 +109,7 @@
   (let [vs @VS
         ds @DS
         spacer 10
-        cnt (int (Mathf/Ceil (/ (count vs) 20)))
+        cnt (int (Mathf/Ceil (/ (count vs) 18)))
         ]
     (dotimes [i (count vs)]
       (if (= (Hard.Helper/Mod i spacer) 0)
@@ -169,7 +169,7 @@
   (clone! :sun)
   (clone! :grid)
   (trip)
-  (reset! snek-cnt 7)
+  (reset! snek-cnt 20)
   (reset! head (clone! :snek/snek-head))
   (reset! tubes (vec (for [_ (range 100)]  (tube!))))
   (reset! balls (vec (for [_ (range 100)] (clone! :snek/ball))))
