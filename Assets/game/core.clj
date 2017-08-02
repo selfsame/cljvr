@@ -9,7 +9,9 @@
   (:require
     game.repl
     game.snek
-    game.gun)
+    game.gun
+    clojure.core.server
+    arcadia.internal.hook-help)
   (:import [UnityEngine GameObject]))
 
 (defn add-ball [s e]
@@ -50,13 +52,14 @@
   (clone! :grass)
   (clone! :skyball)
   (clone! :game1)
-  (clone! :game2))
+  (clone! :game2)
+  (clone! :pingpong))
 
 
 
 '(hook+ (the hook) :start #'start)
 '(start nil)
 '(breakout 0)
-'(set-state! (the game2) :game-fn #'game.gun/start)
+'(set-state! (the pingpong) :game-fn #'game.pingpong/start)
 
 

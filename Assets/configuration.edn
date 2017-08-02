@@ -1,0 +1,5 @@
+{
+	:arcadia.compiler/loadpaths [
+    "Assets/magic"
+    "Assets/mage"
+    "Assets/tools.analyzer/src"]}

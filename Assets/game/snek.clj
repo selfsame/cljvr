@@ -8,9 +8,12 @@
     tween.core
     game.vr
     game.std)
+  (:require [magic.api :as m])
   (:import [UnityEngine GameObject Quaternion Space Mathf Mesh Vector3]
     Curve [Hard Helper]
     Snek))
+
+(m/bind-basic-spells!)
 
 (declare start)
 
@@ -57,6 +60,7 @@
 (defn inc-snek []
   (let [o (gobj (right))
         -VS @VS
+        -DS @DS
         cnt (* @snek-cnt 10) ;70
         step (* 0.5 UnityEngine.Time/deltaTime)
         exant-cnt (dec (.Length -VS))
@@ -67,8 +71,8 @@
            (v3* (.forward (.transform o)) step)))
     (aset rs 0 (.rotation (.transform o)))
     (dotimes [i (dec cnt)]
-      (aset vs (inc i) (Hard.Helper/Aget -VS (Mathf/Min i exant-cnt)))
-      (aset rs (inc i) (Hard.Helper/Aget @DS (Mathf/Min i exant-cnt))))
+      (m/faster (aset vs (inc i) (Hard.Helper/Aget -VS (Mathf/Min i exant-cnt))))
+       (aset rs (inc i) (Hard.Helper/Aget -DS (Mathf/Min i exant-cnt))))
     (reset! VS vs)
     (reset! DS rs)))
 
@@ -91,34 +95,37 @@
 (defn place-tube [offset tube vs ds]
   (let [verts (vertices @raw-tube)
         offset-idx (- (* offset tube-segments) offset)
-        last-idx (- (.Length vs) 1)
-        ^UnityEngine.AnimationCurve curve (.curve (cmpt @curve Curve))]
+        last-idx (- (.-Length vs) 1)
+        ^UnityEngine.AnimationCurve curve (.-curve (cmpt @curve Curve))
+        ^UnityEngine.Mesh mesh (.-mesh (cmpt tube UnityEngine.MeshFilter))]
     (dotimes [i tube-segments]
       (let [snake-idx (Mathf/Min (+ (* i 2) offset-idx) last-idx)
             ^Vector3 v (Hard.Helper/Aget vs snake-idx)
             ^Quaternion d (Hard.Helper/Aget ds snake-idx)
-            radius (* 0.05 (.Evaluate curve (float (- 1.0 (/ snake-idx (.Length vs))))))]
+            radius (* 0.05 (.Evaluate curve (float (- 1.0 (/ snake-idx (.-Length vs))))))]
       (dotimes [j segment-verts]
-        (let [^System.Int64 idx (+ (* (- 9 i) 12) j)]
+        (m/faster (let [^System.Int64 idx (+ (* (- 9 i) 12) j)]
           (aset verts idx 
-            (v3+ v (v3* (q* d (Hard.Helper/Aget verts idx)) radius)) )))))
-    (vertices! tube verts)
-    (.RecalculateNormals (.mesh (.GetComponent tube UnityEngine.MeshFilter)))))
+            (v3+ v (v3* (q* d (Hard.Helper/Aget verts idx)) radius)) ))))))
+    ;(vertices! tube verts)
+    (set! (.-vertices mesh) verts)
+    (.RecalculateNormals mesh)
+    (.RecalculateBounds mesh)))
+
+(m/defn tubecnt [vs]
+  (int (Mathf/Ceil (/ (float (count vs)) (float 18.0)))))
 
 (defn tubesnek [] 
   (let [vs @VS
         ds @DS
         spacer 10
-        cnt (int (Mathf/Ceil (/ (count vs) 18)))
-        ]
-    (dotimes [i (count vs)]
+        cnt (tubecnt vs)]
+    (dotimes [i (.-Length vs)]
       (if (= (Hard.Helper/Mod i spacer) 0)
         (if-let [ball (get @balls (int (/ i spacer)))]
           (position! ball (get vs i)))))
     (dotimes [i cnt]
-      (place-tube (* i 2) (get @tubes i) vs ds)
-      ;(Snek/PlaceTube (* i tube-segments) @raw-tube (get @tubes i) vs ds)
-      )
+      (place-tube (* i 2) (get @tubes i) vs ds))
     true))
 
 (defn place-snake [n]
@@ -152,9 +159,9 @@
               (destroy thing))
           (= (.name thing) "ball")
           (if (every? #(not= % thing) (take 4 @balls))
-              (start nil))
-
-          )))
+            (timeline* 
+              (wait 0)
+              #(do (start nil) nil))) )))
 
 (defn tube! []
   (let [tube (clone! :snek/tube)]
@@ -185,12 +192,6 @@
     (hook+ session? :on-draw-gizmos #'snek-gizmos))
   (on-hand (right) (clone! :snek/minisnake)))
 
-(start nil)
-
-
+'(start nil)
 
 '(clear-cloned!)
-
-
-
-

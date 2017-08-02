@@ -6,7 +6,7 @@
     hard.seed
     game.vr)
   (:require
-    game.repl
+    ;game.repl
     hard.mesh)
   (:import 
     [UnityEngine GameObject Color]
@@ -40,11 +40,11 @@
           (update-state! hand :touching #(disj % o))
           (if-let [f (state o :on-trigger-exit)] ((eval f) o c)))))
     (on-hand hand toucher)
-    (hand+ hand-controller :menu-button-clicked #'game.repl/toggle-repl)
+    ;(hand+ hand-controller :menu-button-clicked #'game.repl/toggle-repl)
     (hand+ hand-controller :trigger-clicked #'trigger-clicked)))
 
 (defn base-vr []
-  (reset! game.repl/repl nil)
+  ;(reset! game.repl/repl nil)
   (destroy-immediate (the camera-rig))
   (clear-cloned!)
   (clone! :camera-rig)
