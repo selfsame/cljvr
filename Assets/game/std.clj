@@ -12,6 +12,8 @@
     [UnityEngine GameObject Color]
     [Mathf]))
 
+(def RESET (atom (fn [_])))
+
 (defn on-hand [hand o]
   (parent! o (gobj hand))
   (local-position! o (v3 0))
@@ -41,6 +43,7 @@
           (if-let [f (state o :on-trigger-exit)] ((eval f) o c)))))
     (on-hand hand toucher)
     ;(hand+ hand-controller :menu-button-clicked #'game.repl/toggle-repl)
+    (hand+ hand-controller :menu-button-clicked (fn [e c] (@RESET nil)))
     (hand+ hand-controller :trigger-clicked #'trigger-clicked)))
 
 (defn base-vr []

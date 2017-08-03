@@ -8,7 +8,10 @@
     tween.core
     game.vr
     game.std)
-  (:require [magic.api :as m])
+  (:require 
+    [magic.api :as m]
+    ;magic.intrinsics
+    )
   (:import [UnityEngine GameObject Quaternion Space Mathf Mesh Vector3]
     Curve [Hard Helper]
     Snek))
@@ -99,10 +102,10 @@
         ^UnityEngine.AnimationCurve curve (.-curve (cmpt @curve Curve))
         ^UnityEngine.Mesh mesh (.-mesh (cmpt tube UnityEngine.MeshFilter))]
     (dotimes [i tube-segments]
-      (let [snake-idx (Mathf/Min (+ (* i 2) offset-idx) last-idx)
+      (let [snake-idx (m/faster (Mathf/Min (+ (* i 2) offset-idx) last-idx))
             ^Vector3 v (Hard.Helper/Aget vs snake-idx)
             ^Quaternion d (Hard.Helper/Aget ds snake-idx)
-            radius (* 0.05 (.Evaluate curve (float (- 1.0 (/ snake-idx (.-Length vs))))))]
+            radius (* 0.05 (.Evaluate curve (float (- 1 (/ snake-idx (.-Length vs))))))]
       (dotimes [j segment-verts]
         (m/faster (let [^System.Int64 idx (+ (* (- 9 i) 12) j)]
           (aset verts idx 

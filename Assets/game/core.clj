@@ -7,12 +7,15 @@
     game.vr
     game.std)
   (:require
-    game.repl
     game.snek
     game.gun
+    game.pingpong
     clojure.core.server
-    arcadia.internal.hook-help)
+    arcadia.internal.hook-help
+    arcadia.internal.state-help)
   (:import [UnityEngine GameObject]))
+
+(declare start)
 
 (defn add-ball [s e]
   (let [b (clone! :ball (>v3 (gobj s)))]
@@ -45,6 +48,8 @@
 (defn select-game [o h]
   (if-let [f (state o :game-fn)]
     (scene-transition (eval f))))
+
+(reset! game.std/RESET #'start)
 
 (defn start [o]
   (game.std/base-vr)

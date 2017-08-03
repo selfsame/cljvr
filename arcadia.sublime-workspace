@@ -15,7 +15,16 @@
 			"file": "Assets/game/core.clj",
 			"settings":
 			{
-				"buffer_size": 1304,
+				"buffer_size": 1445,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/game/std.clj",
+			"settings":
+			{
+				"buffer_size": 2041,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -24,38 +33,44 @@
 			"file": "Assets/game/snek.clj",
 			"settings":
 			{
-				"buffer_size": 5479,
+				"buffer_size": 5587,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Assets/game/gun.clj",
+			"file": "Assets/magic/magic/api.clj",
 			"settings":
 			{
-				"buffer_size": 4357,
+				"buffer_size": 2026,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/hard/mesh.clj",
+			"settings":
+			{
+				"buffer_size": 1806,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Assets/game/vr.clj",
+			"file": "Assets/Arcadia/Source/arcadia/compiler.clj",
 			"settings":
 			{
-				"buffer_size": 2208,
+				"buffer_size": 8585,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "(ns game.pingpong\n  (:use\n    arcadia.core\n    arcadia.linear\n    hard.core\n    tween.core\n    game.vr\n    game.std\n    hard.physics)\n  (:import [UnityEngine GameObject]))\n\n\n(defn hide-controller [c]\n (.SetActive (first (children (gobj c))) false))\n\n(defn hand-joint [c o]\n  (let [mount (on-hand c (clone! :mount))\n        joint (.AddComponent o UnityEngine.FixedJoint)]\n    (on-hand c o)\n    (set! (.parent (.transform o)) nil)\n    (set! (.enablePreprocessing (cmpt o UnityEngine.FixedJoint)) false)\n    (set! (.connectedBody (cmpt o UnityEngine.FixedJoint))\n      (cmpt mount UnityEngine.Rigidbody))\n    ))\n\n(defn start [o]\n  (game.std/base-vr)\n  (dorun (map destroy (every toucher)))\n  (clone! :grid)\n  (clone! :sun)\n  ;(hand-joint (left) (clone! :paddle))\n  (hand-joint (right) (clone! :paddle))\n  ;(hide-controller (left))\n  (hide-controller (right))\n  (hand+ (left) :trigger-clicked \n    (fn [c e] \n      (position! (clone! :ball) (>v3 (gobj c)))))\n  (let [session? (clone! :empty)]\n    ))\n\n'(start nil)\n",
-			"file": "Assets/game/pingpong.clj",
-			"file_size": 1154,
-			"file_write_time": 131456101112037439,
+			"file": "Assets/configuration.edn",
 			"settings":
 			{
-				"buffer_size": 1010,
+				"buffer_size": 103,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
+				"line_ending": "Windows",
+				"name": "{"
 			}
 		},
 		{
@@ -68,10 +83,20 @@
 			}
 		},
 		{
-			"contents": "\n#object[Namespace 0x52387c80 \"user\"]\r\nuser=> \nnil\r\nuser=> \n(start nil)\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0xcec92080 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> UnityEngine.FixedJoint\nUnityEngine.FixedJoint\r\ngame.pingpong=> UnityEngine.FixedJoint\n#unity/FixedJoint -15762\r\ngame.pingpong=> \nSystem.MissingMethodException: Cannot find instance field/property/member name ConnectedBody\nat System.Dynamic.UpdateDelegates.UpdateAndExecute1<object, object> (System.Runtime.CompilerServices.CallSite,object) <IL 0x0010c, 0x00ac3>\nat game/pingpong$eval__5985__5990.__interop_ConnectedBody5992 (object) <IL 0x0000e, 0x00084>\nat game/pingpong$eval__5985__5990.invokeStatic () <IL 0x0006f, 0x004a2>\nat game/pingpong$eval__5985__5990.invoke () <IL 0x00000, 0x00048>\n(10 stack frames omitted)\ngame.pingpong=> \nnil\r\ngame.pingpong=> \nnil\r\ngame.pingpong=> \nnil\r\ngame.pingpong=> \n#unity/GameObject -12148\r\ngame.pingpong=> \nSystem.ArgumentException: failed to convert parameters\n  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00063] in /Users/builduser/buildslave/mono/build/mcs/class/corlib/System.Reflection/MonoMethod.cs:192 \n  at System.Reflection.MonoProperty.SetValue (System.Object obj, System.Object value, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] index, System.Globalization.CultureInfo culture) [0x00064] in /Users/builduser/buildslave/mono/build/mcs/class/corlib/System.Reflection/MonoProperty.cs:331 \n  at System.Reflection.PropertyInfo.SetValue (System.Object obj, System.Object value, System.Object[] index) [0x00000] in /Users/builduser/buildslave/mono/build/mcs/class/corlib/System.Reflection/PropertyInfo.cs:102 \n  at clojure.lang.Reflector.SetInstanceFieldOrProperty (System.Object target, System.String fieldName, System.Object val) [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6157__6162.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6157__6162.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.pingpong=> UnityEngine.Rigidbody\nUnityEngine.Rigidbody\r\ngame.pingpong=> \n#'game.pingpong/hand-joint\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \nSystem.ArgumentException: No implementation of method: :cmpt of protocol: #'arcadia.core/IEntityComponent found for class: nil\n  at clojure/core$_cache_protocol_fn__40998.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__40998.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__734fn__739G__697__754__757.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6301__6306.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6301__6306.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.pingpong=> \nSystem.ArgumentException: No implementation of method: :cmpt of protocol: #'arcadia.core/IEntityComponent found for class: nil\n  at clojure/core$_cache_protocol_fn__40998.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__40998.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__734fn__739G__697__754__757.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6335__6340.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6335__6340.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.pingpong=> \nSystem.ArgumentException: No implementation of method: :cmpt of protocol: #'arcadia.core/IEntityComponent found for class: nil\n  at clojure/core$_cache_protocol_fn__40998.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__40998.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__734fn__739G__697__754__757.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$hand_joint__6195.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$start__6266.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6369__6374.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__6369__6374.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.pingpong=> \n#'game.pingpong/hand-joint\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0x26b0e00 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> \n#'game.pingpong/hand-joint\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0x7c978e40 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> \n#'game.pingpong/hand-joint\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0xc2d1b680 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> \n#'game.pingpong/hand-joint\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0x1727e240 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> (destroy (every toucher))\nSystem.InvalidCastException: Cannot cast from source type to destination type.\n  at arcadia/core$destroy__6799.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$destroy__6799.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__7924__7929.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/pingpong$eval__7924__7929.invoke () [0x00000] in <filename unknown>:0 \n(7 stack frames omitted)\ngame.pingpong=> (map destroy (every toucher))\n(nil)\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0x63545040 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0x14242b40 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \n#object[tween/core$array_timelinefn__2869__2873 0xcd3036c0 \"tween/core$array_timelinefn__2869__2873\"]\r\ngame.pingpong=> >v3\nclojure.lang.Compiler+CompilerException: System.InvalidOperationException: Can't take the value of a macro: #'hard.core/>v3\r\n  at clojure.lang.Compiler.AnalyzeSymbol (clojure.lang.Symbol symbol) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.Analyze (clojure.lang.CljCompiler.Ast.ParserContext pcontext, System.Object form, System.String name) [0x00000] in <filename unknown>:0 , compiling: (NO_SOURCE_PATH:0:0)\n\n(9 stack frames omitted)\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \n#'game.pingpong/start\r\ngame.pingpong=> \nnil\r\ngame.pingpong=> \nnil\r\ngame.pingpong=> ",
+			"contents": "Searching 18 files for \"repl\"\n\nC:\\dev\\unity\\cljvr\\Assets\\game\\repl.clj:\n    1: (ns game.repl\n    2    (:use\n    3      arcadia.core\n    .\n    6      tween.core\n    7      game.vr\n    8:     repl.parser)\n    9    (:require\n   10:     arcadia.repl\n   11      [clojure.string :as string])\n   12    (:import [UnityEngine GameObject]))\n   13  \n   14: (defonce repl (atom nil))\n   15: (def repl-env (atom (arcadia.repl/env-map)))\n   16  (def prompt  (atom 0))\n   17  (def histidx (atom 0))\n   ..\n   33    (rotation! o (rotation (gobj hand))))\n   34  \n   35: (defn repl-display [o]\n   36:   (text! (the repl) (parse (str (state o :text)))))\n   37  \n   38  (defn topogolize-cursor [n s]\n   ..\n   53           0.098))))\n   54  \n   55: (defn eval-repl [o]\n   56    (timeline*\n   57      #(do \n   58        (let [form (state o :text)\n   59:             {:keys [result env]} (arcadia.repl/repl-eval-print @repl-env form)]\n   60          (when-not (#{\"\" (last @history)} form)\n   61            (swap! history conj form))\n   62          (reset! histidx -1)\n   63:         (reset! repl-env env)\n   64:         (text! (state o :ns-obj) (str (ns-name (:*ns* @repl-env))))\n   65          (text! (state o :publics-obj) \n   66:           (apply str (interpose \"\\n\" (keys (ns-publics (:*ns* @repl-env))))))\n   67          (set-state! o :text (str form \"\\n\" result))\n   68          (reset! prompt (count (state o :text)))) nil)))\n   69  \n   70: (defn init-repl [o]\n   71    (set-state! o :cursor 0)\n   72    (set-state! o :cursor-obj (child-named o \"cursor\"))\n   ..\n   89          (if-let [f (state ko :f)]\n   90            (case f\n   91:             :back (update-state! @repl :text #(subs % 0 (max 0 (dec (count %)))))\n   92:             :enter (update-state! @repl :text #(str % \"\\n\"))\n   93:             :clear (set-state! @repl :text \"\")\n   94:             :eval (eval-repl @repl)\n   95              :shift (toggle-shift true)\n   96              nil)\n   97:           (update-state! @repl :text #(str % chr)))\n   98:         (repl-display @repl)\n   99:         (update-cursor @repl)\n  100          (haptic (state o :index))\n  101          (timeline*\n  ...\n  128  \n  129  \n  130: (defn toggle-repl [s e]\n  131:   (if @repl \n  132      (do \n  133        (dorun (map destroy (every mallet)))\n  134        (timeline* \n  135:         (tween {:local {:scale (v3 0)}} @repl 0.6 :pow3)\n  136          #(do \n  137:           (reset! repl (destroy @repl)) nil)))\n  138:     (do (reset! repl (clone! :repl))\n  139:         (init-repl @repl)\n  140:         (eval-repl @repl)\n  141:         (set-state! @repl :text \"\")\n  142          (mallets!)\n  143:         (let [rs (local-scale @repl)]\n  144:           (local-scale! @repl (v3 0))\n  145            (timeline*\n  146:             (tween {:local {:scale rs}} @repl 0.6 :pow3))))))\n  147  \n  148  \n\nC:\\dev\\unity\\cljvr\\Assets\\game\\std.clj:\n    7      game.vr)\n    8    (:require\n    9:     ;game.repl\n   10      hard.mesh)\n   11    (:import \n   ..\n   41            (if-let [f (state o :on-trigger-exit)] ((eval f) o c)))))\n   42      (on-hand hand toucher)\n   43:     ;(hand+ hand-controller :menu-button-clicked #'game.repl/toggle-repl)\n   44      (hand+ hand-controller :trigger-clicked #'trigger-clicked)))\n   45  \n   46  (defn base-vr []\n   47:   ;(reset! game.repl/repl nil)\n   48    (destroy-immediate (the camera-rig))\n   49    (clear-cloned!)\n\nC:\\dev\\unity\\cljvr\\Assets\\game\\todo.clj:\n    3  '[VR utils]\n    4  \n    5: '[::repl]\n    6  '(( ) deduce cursor position from cursor index + newline topogrophy)\n    7  '(( ) holdable shift key)\n\nC:\\dev\\unity\\cljvr\\Assets\\game\\vr.clj:\n   38  (defn un-camel [s]\n   39    (-> s name\n   40:     (string/replace #\"[-_]\" \" \")\n   41:     (string/replace #\"([a-z])([A-Z])\" \"$1 $2\")\n   42:     (string/replace #\" [a-z]\" string/upper-case)\n   43:     (string/replace #\"^[a-z]\" string/upper-case)\n   44:     (string/replace #\" \" \"\")))\n   45  \n   46  (defn hand-delegate [f]\n\n51 matches across 4 files\n",
 			"settings":
 			{
-				"buffer_size": 8237,
+				"buffer_size": 3961,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "\n(set-state! (the pingpong) :game-fn (var game.pingpong/start))\r\ngame.core=> \nnil\r\ngame.core=> \n#object[Namespace 0x1cdae000 \"game.core\"]\r\ngame.core=> \nnil\r\nuser=> \nnil\r\ngame.core=> \n#unity/GameObject 14530\r\ngame.core=> \nnil\r\ngame.snek=> \nnil\r\ngame.snek=> \n(clear-cloned!)\r\ngame.snek=> \n{}\r\ngame.snek=> \n#unity/GameObject -30288\r\ngame.snek=> \n#unity/GameObject -36128\r\ngame.snek=> \n(clear-cloned!)\r\ngame.snek=> \n#unity/GameObject -44738\r\ngame.snek=> \nnil\r\ngame.snek=> \n#unity/GameObject -72606\r\ngame.snek=> ",
+			"settings":
+			{
+				"buffer_size": 507,
 				"line_ending": "Windows",
 				"name": "*arcadia-repl*",
 				"scratch": true
@@ -119,13 +144,33 @@
 	"expanded_folders":
 	[
 		"/C/dev/unity/cljvr/Assets",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Helpers",
+		"/C/dev/unity/cljvr/Assets/Arcadia",
+		"/C/dev/unity/cljvr/Assets/Arcadia/Source",
 		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia",
 		"/C/dev/unity/cljvr/Assets/game",
-		"/C/dev/unity/cljvr/Assets/repl"
+		"/C/dev/unity/cljvr/Assets/mage/mage",
+		"/C/dev/unity/cljvr/Assets/magic",
+		"/C/dev/unity/cljvr/Assets/magic/magic",
+		"/C/dev/unity/cljvr/Assets/magic/magic/spells",
+		"/C/dev/unity/cljvr/Assets/repl",
+		"/C/dev/unity/cljvr/Assets/tools.analyzer/src",
+		"/C/dev/unity/cljvr/Assets/tools.analyzer/src/main",
+		"/C/dev/unity/cljvr/Assets/tools.analyzer/src/main/clojure",
+		"/C/dev/unity/cljvr/Assets/tools.analyzer/src/main/clojure/clojure",
+		"/C/dev/unity/cljvr/Assets/tools.analyzer/src/main/clojure/clojure/tools"
 	],
 	"file_history":
 	[
+		"/E/projects/joe/dev/unity/fasters/Assets/selfsame.clj",
+		"/C/dev/unity/cljvr/Assets/game/gun.clj",
+		"/C/dev/unity/cljvr/Assets/game/pingpong.clj",
+		"/C/dev/unity/cljvr/Assets/magic/run.clj",
+		"/C/dev/unity/cljvr/Assets/magic/magic/tests_generative.clj",
+		"/E/projects/joe/dev/unity/fasters/Assets/tween/faster.clj",
+		"/E/projects/joe/dev/unity/fasters/Assets/tween/core.clj",
+		"/E/projects/joe/dev/unity/tween/core.clj",
+		"/E/projects/joe/dev/unity/tween/test.clj",
+		"/C/dev/unity/cljvr/Assets/Arcadia/configuration.edn",
 		"/C/dev/unity/cljvr/Assets/Arcadia/Source/arcadia/linear.clj",
 		"/C/dev/unity/cljvr/Assets/hard/core.clj",
 		"/C/dev/unity/cljvr/Assets/hard/Helper.cs",
@@ -161,13 +206,17 @@
 	],
 	"find":
 	{
-		"height": 39.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
 		"height": 109.0,
 		"where_history":
 		[
+			"C:\\dev\\unity\\cljvr\\Assets\\game",
+			"C:\\dev\\unity\\cljvr\\Assets\\magic",
+			"C:\\dev\\unity\\cljvr\\Assets",
+			"C:\\dev\\unity\\cljvr\\Assets\\game",
 			"C:\\dev\\unity\\cljvr\\Assets\\Arcadia\\Source\\arcadia",
 			"C:\\dev\\unity\\cljvr\\Assets\\Arcadia\\Source\\clojure",
 			"C:\\dev\\unity\\cljvr\\Assets\\game",
@@ -180,6 +229,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"repl",
+			"user",
+			"generative",
+			"repl",
+			"test-generative",
+			"test.check",
+			"compiler",
+			"inc-snek",
+			"lift-vars",
+			"faster",
 			"mesh",
 			"aget",
 			"|",
@@ -226,7 +285,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -235,15 +294,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1304,
+						"buffer_size": 1445,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								62,
-								64
+								717,
+								717
 							]
 						],
 						"settings":
@@ -261,19 +320,19 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Assets/game/snek.clj",
+					"file": "Assets/game/std.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5479,
+						"buffer_size": 2041,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3795,
-								3795
+								200,
+								200
 							]
 						],
 						"settings":
@@ -283,7 +342,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1461.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
@@ -291,19 +350,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "Assets/game/gun.clj",
+					"file": "Assets/game/snek.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4357,
+						"buffer_size": 5587,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4232,
-								4237
+								5569,
+								5569
 							]
 						],
 						"settings":
@@ -313,27 +372,57 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1827.0,
+						"translation.y": 2107.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Assets/magic/magic/api.clj",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 2026,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2026,
+								2026
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "Assets/game/vr.clj",
-					"semi_transient": true,
+					"buffer": 4,
+					"file": "Assets/hard/mesh.clj",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2208,
+						"buffer_size": 1806,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1872,
-								1872
+								289,
+								265
 							]
 						],
 						"settings":
@@ -342,43 +431,80 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 180.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "Assets/game/pingpong.clj",
+					"buffer": 5,
+					"file": "Assets/Arcadia/Source/arcadia/compiler.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1010,
+						"buffer_size": 8585,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1000,
-								1000
+								4700,
+								4686
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 135.0,
+						"translation.y": 2051.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
+					"file": "Assets/configuration.edn",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 103,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								103,
+								103
+							]
+						],
+						"settings":
+						{
+							"auto_name": "{",
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 7,
 					"file": "Assets/game/todo.clj",
 					"semi_transient": false,
 					"settings":
@@ -398,33 +524,279 @@
 						{
 							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage"
 						},
-						"translation.x": 175.0,
+						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
-					"buffer": 6,
+					"buffer": 8,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8237,
+						"buffer_size": 3961,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										88,
+										92
+									],
+									[
+										190,
+										194
+									],
+									[
+										241,
+										245
+									],
+									[
+										355,
+										359
+									],
+									[
+										384,
+										388
+									],
+									[
+										408,
+										412
+									],
+									[
+										558,
+										562
+									],
+									[
+										596,
+										600
+									],
+									[
+										737,
+										741
+									],
+									[
+										872,
+										876
+									],
+									[
+										877,
+										881
+									],
+									[
+										894,
+										898
+									],
+									[
+										1066,
+										1070
+									],
+									[
+										1142,
+										1146
+									],
+									[
+										1271,
+										1275
+									],
+									[
+										1434,
+										1438
+									],
+									[
+										1651,
+										1655
+									],
+									[
+										1741,
+										1745
+									],
+									[
+										1806,
+										1810
+									],
+									[
+										1852,
+										1856
+									],
+									[
+										1858,
+										1862
+									],
+									[
+										1967,
+										1971
+									],
+									[
+										2009,
+										2013
+									],
+									[
+										2023,
+										2027
+									],
+									[
+										2060,
+										2064
+									],
+									[
+										2175,
+										2179
+									],
+									[
+										2200,
+										2204
+									],
+									[
+										2345,
+										2349
+									],
+									[
+										2407,
+										2411
+									],
+									[
+										2422,
+										2426
+									],
+									[
+										2459,
+										2463
+									],
+									[
+										2473,
+										2477
+									],
+									[
+										2501,
+										2505
+									],
+									[
+										2507,
+										2511
+									],
+									[
+										2534,
+										2538
+									],
+									[
+										2540,
+										2544
+									],
+									[
+										2574,
+										2578
+									],
+									[
+										2653,
+										2657
+									],
+									[
+										2692,
+										2696
+									],
+									[
+										2781,
+										2785
+									],
+									[
+										2915,
+										2919
+									],
+									[
+										3139,
+										3143
+									],
+									[
+										3151,
+										3155
+									],
+									[
+										3284,
+										3288
+									],
+									[
+										3289,
+										3293
+									],
+									[
+										3450,
+										3454
+									],
+									[
+										3670,
+										3674
+									],
+									[
+										3710,
+										3714
+									],
+									[
+										3764,
+										3768
+									],
+									[
+										3820,
+										3824
+									],
+									[
+										3876,
+										3880
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 507,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8237,
-								8237
+								507,
+								507
 							]
 						],
 						"settings":
@@ -437,10 +809,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1892.0,
+						"translation.y": 252.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -448,7 +820,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 23.0
+		"height": 22.0
 	},
 	"input":
 	{
@@ -462,24 +834,31 @@
 				0,
 				0,
 				1,
-				1
+				2
 			],
 			[
-				0,
 				1,
 				1,
+				2,
 				2
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.538551571839,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
-			0.785234394057,
+			0.589554923744,
 			1.0
 		]
 	},
@@ -492,7 +871,7 @@
 	"project": "arcadia.sublime-project",
 	"replace":
 	{
-		"height": 42.0
+		"height": 40.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -530,7 +909,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 178.0,
+	"side_bar_width": 326.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
