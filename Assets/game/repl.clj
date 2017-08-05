@@ -36,6 +36,7 @@
   (text! (the repl) (parse (str (state o :text)))))
 
 (defn topogolize-cursor [n s]
+  (log [n s])
   (let [split-lines (string/split s #"\n")]
     (loop [n n y 0 lines split-lines]
       (if (or (empty? lines) 

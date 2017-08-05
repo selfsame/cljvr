@@ -33,16 +33,8 @@
 			"file": "Assets/game/snek.clj",
 			"settings":
 			{
-				"buffer_size": 1009,
+				"buffer_size": 5355,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Assets/Arcadia/Source/arcadia/internal/state_help.clj",
-			"settings":
-			{
-				"buffer_size": 1307,
 				"line_ending": "Windows"
 			}
 		},
@@ -50,25 +42,7 @@
 			"file": "Assets/game/gun.clj",
 			"settings":
 			{
-				"buffer_size": 4291,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Assets/hard/physics.clj",
-			"settings":
-			{
-				"buffer_size": 2426,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Assets/hard/core.clj",
-			"settings":
-			{
-				"buffer_size": 10126,
+				"buffer_size": 4357,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -77,16 +51,37 @@
 			"file": "Assets/game/std.clj",
 			"settings":
 			{
-				"buffer_size": 2102,
+				"buffer_size": 1936,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "\n#object[Namespace 0xd5b68600 \"user\"]\r\nuser=> \nnil\r\nuser=> \nnil\r\ngame.core=> (set-state! (the Sphere) :foo #'add-ball)\nclojure.lang.Compiler+CompilerException: clojure.lang.CljCompiler.Ast.ParseException: Unable to resolve var: add-ball in this context\r\n  at clojure.lang.CljCompiler.Ast.TheVarExpr+Parser.Parse (clojure.lang.CljCompiler.Ast.ParserContext pcon, System.Object form) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.AnalyzeSeq (clojure.lang.CljCompiler.Ast.ParserContext pcon, ISeq form, System.String name) [0x00000] in <filename unknown>:0 , compiling: (NO_SOURCE_PATH:0:0)\n\n(1 stack frames omitted)\ngame.core=> \n#'game.core/add-ball\r\ngame.core=> (set-state! (the Sphere) :foo #'add-ball)\n{:foo #'game.core/add-ball}\r\ngame.core=> \nnil\r\ngame.core=> (state (the Sphere))\n{:foo #'game.core/add-ball}\r\ngame.core=> ",
+			"contents": "(ns game.repl\n  (:use\n    arcadia.core\n    arcadia.linear\n    hard.core\n    tween.core\n    game.vr\n    repl.parser)\n  (:require\n    arcadia.repl\n    [clojure.string :as string])\n  (:import [UnityEngine GameObject]))\n\n(defonce repl (atom nil))\n(def repl-env (atom (arcadia.repl/env-map)))\n(def prompt  (atom 0))\n(def histidx (atom 0))\n(def ns-str  (atom \"user=>\"))\n(def history (atom []))\n(def shift (atom false))\n\n(defn text [o] (.text (child-component o UnityEngine.TextMesh)))\n\n(deftween [:text :color] [this]\n  {:base (.GetComponent this UnityEngine.TextMesh)\n   :base-tag UnityEngine.TextMesh\n   :get (.color this)\n   :tag UnityEngine.Color})\n\n(defn on-hand [hand o]\n  (parent! o (gobj hand))\n  (local-position! o (v3 0))\n  (rotation! o (rotation (gobj hand))))\n\n(defn repl-display [o]\n  (text! (the repl) (parse (str (state o :text)))))\n\n(defn topogolize-cursor [n s]\n  (let [split-lines (string/split s #\"\\n\")]\n    (loop [n n y 0 lines split-lines]\n      (if (or (empty? lines) \n              (>= (count (first lines)) n))\n        [[n y] (count split-lines)]\n        (recur (- n (inc (count (first lines)))) (inc y) (rest lines))))))\n\n(defn update-cursor [o]\n  (let [s (state o :text)\n        n (count s)\n        [[x y] lc] (topogolize-cursor n s)]\n  (set-state! o :cursor n)\n  (local-position! (state o :cursor-obj) \n    (v3* (v3 x (+ (- lc y) 0.1) 0)\n         0.098))))\n\n(defn eval-repl [o]\n  (timeline*\n    #(do \n      (let [form (state o :text)\n            {:keys [result env]} (arcadia.repl/repl-eval-print @repl-env form)]\n        (when-not (#{\"\" (last @history)} form)\n          (swap! history conj form))\n        (reset! histidx -1)\n        (reset! repl-env env)\n        (text! (state o :ns-obj) (str (ns-name (:*ns* @repl-env))))\n        (text! (state o :publics-obj) \n          (apply str (interpose \"\\n\" (keys (ns-publics (:*ns* @repl-env))))))\n        (set-state! o :text (str form \"\\n\" result))\n        (reset! prompt (count (state o :text)))) nil)))\n\n(defn init-repl [o]\n  (set-state! o :cursor 0)\n  (set-state! o :cursor-obj (child-named o \"cursor\"))\n  (set-state! o :ns-obj (child-named o \"ns\"))\n  (set-state! o :publics-obj (child-named o \"publics\"))\n  (update-cursor o))\n\n(defn toggle-shift [down]\n  (reset! shift down)\n  (if down\n    (dorun (map #(text! % (str (state % :shift-key))) (every key)))\n    (dorun (map #(text! % (str (state % :key))) (every key)))))\n\n\n(defn mallet-enter [o c]\n  (when (:key (state (.gameObject c)))\n    (let [ko (.gameObject c)\n          kt (gobj (.GetComponentInChildren ko UnityEngine.TextMesh))]\n      (when-let [chr (state ko (if @shift :shift-key :key))]\n        (if-let [f (state ko :f)]\n          (case f\n            :back (update-state! @repl :text #(subs % 0 (max 0 (dec (count %)))))\n            :enter (update-state! @repl :text #(str % \"\\n\"))\n            :clear (set-state! @repl :text \"\")\n            :eval (eval-repl @repl)\n            :shift (toggle-shift true)\n            nil)\n          (update-state! @repl :text #(str % chr)))\n        (repl-display @repl)\n        (update-cursor @repl)\n        (haptic (state o :index))\n        (timeline*\n          (tween {:local {:scale (v3 1.5)}\n                  :text {:color (color 0 1 1)}} kt 0.1))))))\n\n(defn mallet-exit [o c]\n  (when (:key (state (.gameObject c)))\n    (let [ko (.gameObject c)\n          kt (gobj (.GetComponentInChildren ko UnityEngine.TextMesh))]\n      (when-let [chr (state ko :key)]\n        (if-let [f (state ko :f)]\n          (case f\n            :shift (toggle-shift false)\n            nil))\n        (timeline*\n          (tween {:local {:scale (v3 1)}\n                  :text {:color (color 1 1 1 0.25)}} kt 0.1))))))\n\n(defn init-mallet [o hand]\n  (hook-clear o :on-trigger-enter)\n  (hook-clear o :on-trigger-exit)\n  (set-state! o :index (.controllerIndex hand))\n  (hook+ o :on-trigger-enter #'mallet-enter)\n  (hook+ o :on-trigger-exit #'mallet-exit) o)\n\n(defn mallets! []\n  (on-hand (left) (init-mallet (clone! :mallet) (left)))\n  (on-hand (right) (init-mallet (clone! :mallet) (right))))\n\n\n(defn toggle-repl [s e]\n  (if @repl \n    (do \n      (dorun (map destroy (every mallet)))\n      (timeline* \n        (tween {:local {:scale (v3 0)}} @repl 0.6 :pow3)\n        #(do \n          (reset! repl (destroy @repl)) nil)))\n    (do (reset! repl (clone! :repl))\n        (init-repl @repl)\n        (eval-repl @repl)\n        (set-state! @repl :text \"\")\n        (mallets!)\n        (let [rs (local-scale @repl)]\n          (local-scale! @repl (v3 0))\n          (timeline*\n            (tween {:local {:scale rs}} @repl 0.6 :pow3))))))\n\n\n; Editor setup\n\n(def keychars [\n  \"`1234567890-=\"\n  \"qwertyuiop[]\\\\\"\n  \"asdfghjkl;'\"\n  \"zxcvbnm,./\"])\n\n(def shift-keychars [\n  \"~!@#$%^&*()_+\"\n  \"QWERTYUIOP{}|\"\n  \"ASDFGHJKL:\\\"\"\n  \"ZXCVBNM<>?\"])\n\n(defn make-keyboard []\n  (let [board (clone! :keyboard)]\n  (dorun \n    (for [z (range (count keychars))\n          :let [row (vec (nth keychars z))\n                shift-row (vec (nth shift-keychars z))]]\n      (dorun (for [x (range (count row))\n            :let [chr (nth row x)\n                  shift-chr (nth shift-row x)]]\n        (let [k (clone! :key (v3* (v3 (+ x (* z 0.4)) 0 (- z)) 0.11))]\n          (set-state! k :key chr)\n          (set-state! k :shift-key shift-chr)\n          (text! k (str chr))\n          (parent! k board))))))))",
+			"file": "Assets/game/repl.clj",
+			"file_size": 5486,
+			"file_write_time": 131463014032460876,
 			"settings":
 			{
-				"buffer_size": 841,
+				"buffer_size": 5296,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/SteamVR/Scripts/SteamVR_TrackedObject.cs",
+			"settings":
+			{
+				"buffer_size": 1851,
+				"encoding": "UTF-8 with BOM",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "\n#object[Namespace 0x9b081880 \"user\"]\r\nuser=> \n(set-state! (the game2) :game-fn (var game.gun/start))\r\ngame.core=> \n(set-state! (the game2) :game-fn (var game.gun/start))\r\ngame.core=> \nSystem.ArgumentException: No implementation of method: :gobj of protocol: #'arcadia.core/ISceneGraph found for class: nil\n  at clojure/core$_cache_protocol_fn__9450.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__9450.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__31341fn__31368G__31302__31381__31384.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__36476.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__36476.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_vr__36486.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/std$base_vr__36486.invoke () [0x00000] in <filename unknown>:0 \n  at game/core$start__37663.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/core$start__37663.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/core$eval__37720__37725.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/core$eval__37720__37725.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.core=> \n#unity/GameObject -169636\r\ngame.core=> \n#unity/GameObject -169856\r\ngame.core=> \n#unity/GameObject -170066\r\ngame.core=> \nWARNING: *data-readers* already refers to: #'clojure.core/*data-readers* in namespace: arcadia.literals, being replaced by: #'arcadia.literals/*data-readers*\r\n#unity/GameObject -170262\r\ngame.core=> \n#unity/GameObject -170538\r\ngame.core=> \nSystem.ArgumentException: No implementation of method: :gobj of protocol: #'arcadia.core/ISceneGraph found for class: nil\n  at clojure/core$_cache_protocol_fn__9450.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__9450.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__31341fn__31368G__31302__31381__31384.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__36476.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__36476.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_vr__36486.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/std$base_vr__36486.invoke () [0x00000] in <filename unknown>:0 \n  at game/core$eval__37971__37976.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/core$eval__37971__37976.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.core=> \n#'game.std/gradiate\r\ngame.std=> \nnil\r\ngame.std=> \nnil\r\ngame.std=> \n{}\r\ngame.std=> \n#unity/GameObject -172002\r\ngame.std=> \nSystem.ArgumentException: No implementation of method: :gobj of protocol: #'arcadia.core/ISceneGraph found for class: nil\n  at clojure/core$_cache_protocol_fn__9450.invokeStatic (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/core$_cache_protocol_fn__9450.invoke (System.Object , System.Object , System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at arcadia/core$eval__31341fn__31368G__31302__31381__31384.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__38070.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$base_hand__38070.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/std$eval__38274__38279.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/std$eval__38274__38279.invoke () [0x00000] in <filename unknown>:0 \n(8 stack frames omitted)\ngame.std=> (left)\nnil\r\ngame.std=> \n(object-typed SteamVR_ControllerManager)\nclojure.lang.Compiler+CompilerException: System.InvalidOperationException: Unable to resolve symbol: SteamVR_ControllerManager in this context\r\n  at clojure.lang.Compiler.ResolveIn (clojure.lang.Namespace n, clojure.lang.Symbol symbol, Boolean allowPrivate) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.Resolve (clojure.lang.Symbol symbol) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.AnalyzeSymbol (clojure.lang.Symbol symbol) [0x00000] in <filename unknown>:0 \r\n  at clojure.lang.Compiler.Analyze (clojure.lang.CljCompiler.Ast.ParserContext pcontext, System.Object form, System.String name) [0x00000] in <filename unknown>:0 , compiling: (NO_SOURCE_PATH:0:0)\n  at clojure.lang.CljCompiler.Ast.HostExpr.ParseArgs (clojure.lang.CljCompiler.Ast.ParserContext pcon, ISeq argSeq) [0x00000] in <filename unknown>:0 \n  at clojure.lang.CljCompiler.Ast.HostExpr+Parser.Parse (clojure.lang.CljCompiler.Ast.ParserContext pcon, System.Object form) [0x00000] in <filename unknown>:0 \n(2 stack frames omitted)\ngame.std=> \nnil\r\ngame.vr=> (object-typed SteamVR_ControllerManager)\n#unity/SteamVR_ControllerManager -172006\r\ngame.vr=> (gobj (object-typed SteamVR_ControllerManager))\n#unity/GameObject -172002\r\ngame.vr=> (children (gobj (object-typed SteamVR_ControllerManager)))\n[#unity/GameObject -172014 #unity/GameObject -172026 #unity/GameObject -172048]\r\ngame.vr=> (objects-typed SteamVR_TrackedController)\n()\r\ngame.vr=> \n(set-state! (the game2) :game-fn (var game.gun/start))\r\ngame.core=> \n#unity/GameObject -294624\r\ngame.core=> \n#unity/GameObject -299426\r\ngame.core=> \n#'game.repl/make-keyboard\r\ngame.repl=> \n#'game.repl/toggle-repl\r\ngame.repl=> (toggle-repl)\nclojure.lang.ArityException: Wrong number of args (0) passed to: game/repl/toggle-repl--38869\n  at clojure.lang.AFn.invoke () [0x00000] in <filename unknown>:0 \n  at game/repl$eval__38877__38882.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/repl$eval__38877__38882.invoke () [0x00000] in <filename unknown>:0 \n(7 stack frames omitted)\ngame.repl=> (toggle-repl nil nil)\nSystem.ArgumentNullException: Argument cannot be null.\r\nParameter name: input\n  at System.Text.RegularExpressions.Regex.Split (System.String input, Int32 count, Int32 startat) [0x00000] in <filename unknown>:0 \n  at System.Text.RegularExpressions.Regex.Split (System.String input) [0x00000] in <filename unknown>:0 \n  at clojure/string$split__13403.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at clojure/string$split__13403.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$topogolize_cursor__38483.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$topogolize_cursor__38483.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$update_cursor__38491.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$update_cursor__38491.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$init_repl__38521.invokeStatic (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$init_repl__38521.invoke (System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$toggle_repl__38869.invokeStatic (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$toggle_repl__38869.invoke (System.Object , System.Object ) [0x00000] in <filename unknown>:0 \n  at game/repl$eval__38884__38889.invokeStatic () [0x00000] in <filename unknown>:0 \n  at game/repl$eval__38884__38889.invoke () [0x00000] in <filename unknown>:0 \n(7 stack frames omitted)\ngame.repl=> \n#'game.repl/topogolize-cursor\r\ngame.repl=> (set-state! (the repl) :text \"\")\n{:text \"\"}\r\ngame.repl=> \n#unity/GameObject -349910\r\ngame.core=> ",
+			"settings":
+			{
+				"buffer_size": 7817,
 				"line_ending": "Windows",
 				"name": "*arcadia-repl*",
 				"scratch": true
@@ -117,7 +112,7 @@
 	},
 	"console":
 	{
-		"height": 0.0,
+		"height": 126.0,
 		"history":
 		[
 		]
@@ -133,18 +128,16 @@
 	},
 	"expanded_folders":
 	[
-		"/C/dev/unity/cljvr/Assets",
-		"/C/dev/unity/cljvr/Assets/Arcadia",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Components",
-		"/C/dev/unity/cljvr/Assets/Arcadia/Source",
-		"/C/dev/unity/cljvr/Assets/game",
-		"/C/dev/unity/cljvr/Assets/hard",
-		"/C/dev/unity/cljvr/Assets/repl",
-		"/C/dev/unity/cljvr/Assets/shaders",
-		"/C/dev/unity/cljvr/Assets/tween"
+		"/C/dev/unity/cljvr2017/Assets",
+		"/C/dev/unity/cljvr2017/Assets/game",
+		"/C/dev/unity/cljvr2017/Assets/SteamVR/Extras",
+		"/C/dev/unity/cljvr2017/Assets/SteamVR/Scripts"
 	],
 	"file_history":
 	[
+		"/C/dev/unity/cljvr2017/Assets/hard/core.clj",
+		"/C/dev/unity/cljvr2017/Assets/hard/physics.clj",
+		"/C/dev/unity/cljvr2017/Assets/Arcadia/Source/arcadia/internal/state_help.clj",
 		"/C/dev/unity/cljvr/Assets/game/repl.clj",
 		"/C/dev/unity/cljvr/Assets/hard/mesh.clj",
 		"/C/dev/unity/cljvr/Assets/shaders/vertex.shader",
@@ -231,8 +224,8 @@
 						"selection":
 						[
 							[
-								295,
-								295
+								199,
+								174
 							]
 						],
 						"settings":
@@ -242,10 +235,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 84.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -261,8 +254,8 @@
 						"selection":
 						[
 							[
-								226,
-								226
+								1206,
+								1206
 							]
 						],
 						"settings":
@@ -275,7 +268,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -284,37 +277,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1009,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								182,
-								182
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "Assets/Arcadia/Source/arcadia/internal/state_help.clj",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1307,
+						"buffer_size": 5355,
 						"regions":
 						{
 						},
@@ -335,84 +298,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "Assets/game/gun.clj",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4291,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								97,
-								97
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "Assets/hard/physics.clj",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2426,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								959,
-								959
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "Assets/hard/core.clj",
+					"buffer": 3,
+					"file": "Assets/game/gun.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10126,
+						"buffer_size": 4357,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6059,
-								6059
+								0,
+								0
 							]
 						],
 						"settings":
@@ -422,27 +325,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3902.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 4,
 					"file": "Assets/game/std.clj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2102,
+						"buffer_size": 1936,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								365,
-								365
+								1206,
+								1196
 							]
 						],
 						"settings":
@@ -450,6 +353,71 @@
 							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 168.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Assets/game/repl.clj",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5296,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1140,
+								1140
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/arcadia-repl/Clojure.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 126.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 6,
+					"file": "Assets/SteamVR/Scripts/SteamVR_TrackedObject.cs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1851,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C#/C#.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -465,19 +433,19 @@
 			"sheets":
 			[
 				{
-					"buffer": 8,
+					"buffer": 7,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 841,
+						"buffer_size": 7817,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								841,
-								841
+								7817,
+								7817
 							]
 						],
 						"settings":
@@ -490,10 +458,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 192.0,
+						"translation.y": 1546.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -515,24 +483,31 @@
 				0,
 				0,
 				1,
-				1
+				2
 			],
 			[
-				0,
 				1,
 				1,
+				2,
 				2
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
-			0.816305226462,
+			0.371663244353,
 			1.0
 		]
 	},
@@ -583,7 +558,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 187.0,
+	"side_bar_width": 309.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
