@@ -16,110 +16,81 @@
 
 (declare start)
 
-(def snek-cnt (atom 7))
-(defonce VS (atom nil))
-(defonce DS (atom nil))
-(defonce head (atom nil))
-(defonce curve (atom nil))
-(def segments (atom []))
-(def bones (atom nil))
+(def     snek-cnt (atom 7))
+(defonce VS       (atom nil))
+(defonce DS       (atom nil))
+(defonce head     (atom nil))
+(defonce curve    (atom nil))
+(def     segments (atom []))
+(def     bones    (atom nil))
+(def xvs (UnityEngine.Vector3|[]|. 10000))
+(def xvs-cnt (atom 0))
+(def xqs (UnityEngine.Quaternion|[]|. 10000))
+(def xqs-cnt (atom 0))
 
-(defn prime-snek [o]
-  (let [o (gobj o)
-        step (* 1 UnityEngine.Time/deltaTime)
-        cnt (* @snek-cnt 10)
-        vs (make-array Vector3 cnt)
-        rs (make-array Quaternion cnt)]
-    (dotimes [i cnt]
-      (aset vs i 
-        (v3+ (.position (.transform o))
-             (v3* (.forward (.transform o)) (* i (- step)))))
-      (aset rs i (.rotation (.transform o))))
-    [vs rs]))
-        
-(defn inc-snek []
-  (let [o (gobj (right))
-        -VS @VS
-        cnt (* @snek-cnt 10) ;70
+(m/defn inc-snek []
+  (let [^UnityEngine.GameObject o (gobj (right))
+        ^UnityEngine.Vector3|[]|    -VS @VS
+        ^UnityEngine.Quaternion|[]| -DS @DS
+        ^System.Int64 snek-cnt @snek-cnt
+        cnt (* snek-cnt 10) ;70
         step (* 0.5 UnityEngine.Time/deltaTime)
-        exant-cnt (dec (.Length -VS))
-        vs (make-array Vector3 cnt)
-        rs (make-array Quaternion cnt)]
+        exant-cnt (dec (.-Length -VS))
+        ^UnityEngine.Vector3|[]|    vs (UnityEngine.Vector3|[]|. cnt)
+        ^UnityEngine.Quaternion|[]| rs (UnityEngine.Quaternion|[]|. cnt)]
     (aset vs 0 
-      (v3+ (Hard.Helper/Aget -VS 0)
-           (v3* (.forward (.transform o)) step)))
-    (aset rs 0 (.rotation (.transform o)))
+      (v3+ (aget -VS 0)
+           (v3* (.-forward (.-transform o)) step)))
+    (aset rs 0 (.-rotation (.-transform o)))
     (dotimes [i (dec cnt)]
-      (aset vs (inc i) (Hard.Helper/Aget -VS (Mathf/Min i exant-cnt)))
-      (aset rs (inc i) (Hard.Helper/Aget @DS (Mathf/Min i exant-cnt))))
+      (let [^System.Single idx (Mathf/Min i exant-cnt)
+            ^System.Int64 ii (inc i)]
+        (aset vs ii (aget -VS idx))
+        (aset rs (inc i) (aget -DS idx))))
     (reset! VS vs)
     (reset! DS rs)))
-
-
-(defn place-segment [offset ^UnityEngine.Transform|[]| bones vs ds] ;^int offset  ^Vector3|[]| vs  ^Quaternion|[]| ds
-  (let [offset-idx (- (* offset 6) offset)
-        last-idx (dec (count vs))
-        ^UnityEngine.AnimationCurve curve @curve]
-    (dotimes [i 6]
-      (let [snake-idx       (Mathf/Min (+ (* i 2) offset-idx) last-idx)
-            ^Transform bone (aget bones i)
-            ^Vector3    v   (Hard.Helper/Aget vs snake-idx)
-            ^Quaternion d   (Hard.Helper/Aget ds snake-idx)
-            radius (.Evaluate curve (float (- 1.0 (/ snake-idx (.Length vs)))))]
-        (set! (.position bone) v)
-        (set! (.rotation bone) d)
-        (set! (.localScale bone) (v3 radius)) ))))
-
-
-(m/defn ^System.Single curve-eval [^UnityEngine.AnimationCurve curve ^System.Double n]
-  (.Evaluate curve n))
 
 (m/defn ^System.Double bad-math [^System.Single a ^System.Int32 b]
   (- 1.0 (/ a b)))
 
-(m/defn place-bone [
-    ^UnityEngine.Transform|[]| bones 
-    ^UnityEngine.Vector3|[]| vs 
-    ^UnityEngine.Quaternion|[]| ds 
-    ^int i ^int offset-idx ^int last-idx 
-    ^UnityEngine.AnimationCurve curve]
-  (let [^System.Single snake-idx       (Mathf/Min (+ (* i 2) offset-idx) last-idx)
-        ^Transform bone (aget bones i)
-        ^Vector3    v   (aget vs snake-idx)
-        ^Quaternion d   (aget ds snake-idx)
-        ^System.Single radius (.Evaluate curve (bad-math snake-idx (.-Length vs)))]
-    (set! (.position bone) v)
-    (set! (.rotation bone) d)
-    (set! (.localScale bone) (v3 radius)) ))
-
 (m/defn place-segment [
-  ^int offset 
+  ^System.Int64 offset 
   ^UnityEngine.Transform|[]| bones 
   ^UnityEngine.Vector3|[]| vs 
   ^UnityEngine.Quaternion|[]| ds]
-  (let [^int offset-idx (- (* offset 6) offset)
-        ^int last-idx (dec (count vs))
-        ^UnityEngine.AnimationCurve curve @curve
-        f place-bone]
+  (let [^int                        offset-idx (- (* offset 6) offset)
+        ^int                        last-idx   (dec (count vs))
+        ^UnityEngine.AnimationCurve curve      @curve]
     (dotimes [i 6]
-      (f bones vs ds i offset-idx last-idx curve))))
+      (let [^System.Single snake-idx (Mathf/Min (+ (* i 2) offset-idx) last-idx)
+            ^Transform     bone      (aget bones i)
+            ^Vector3       v         (aget vs snake-idx)
+            ^Quaternion    d         (aget ds snake-idx)
+            ^System.Single radius    (.Evaluate curve (bad-math snake-idx (.-Length vs)))
+            ]
+        (set! (.position bone) v)
+        (set! (.rotation bone) d)
+        (set! (.localScale bone) (v3 radius))))) )
 
-
-
-
-(defn tubesnek [] 
-  (let [vs @VS
-        ds @DS
-        cnt (Mathf/Ceil (* (count vs) 0.1666666))]
+(m/defn tubesnek [^UnityEngine.Vector3|[]| vs ^UnityEngine.Quaternion|[]| ds] 
+  (let [^System.Single               cnt   (Mathf/Ceil (* (count vs) 0.1666666))
+        ^UnityEngine.Transform|[][]| bones @bones]
     (dotimes [i cnt]
-      (place-segment (* i 2) (aget @bones i) vs ds))
+      (let [^System.Int64 offset (* i 2)
+            ^UnityEngine.Transform|[]| bs (aget bones i)] 
+        (place-segment offset bs vs ds)
+        ))
     true))
 
-(defn place-snake [n]
-  (let []
-    (position! @head (aget @VS 0))
-    (rotation! @head (aget @DS 0))
-    (tubesnek)))
+(m/defn place-snake []
+  (let [^UnityEngine.GameObject     head @head
+        ^UnityEngine.Vector3|[]|    vs   @VS 
+        ^UnityEngine.Quaternion|[]| ds   @DS]
+    (set! (.-position (.-transform head)) (aget vs 0))
+    (set! (.-rotation (.-transform head)) (aget ds 0))
+    (tubesnek vs ds)))
+
+
 
 (defn apple! []
   (let [apple (clone! :snek/apple (v3 (?f -1 1)(?f -1 1)(?f -1 1)))
@@ -129,7 +100,7 @@
 (defn update-game [o]
   (let [ro (gobj (right))]
     (inc-snek)
-    (place-snake nil)))
+    (place-snake)))
 
 (defn grow-snek []
   (swap! snek-cnt inc))
@@ -143,6 +114,19 @@
           (= (.name thing) "ball")
           (if true;(every? #(not= % thing) (take 4 @balls))
               (start nil)) )))
+
+(defn prime-snek [o]
+  (let [o (gobj o)
+        step (* 1 UnityEngine.Time/deltaTime)
+        cnt (* @snek-cnt 10)
+        vs (make-array Vector3 cnt)
+        rs (make-array Quaternion cnt)]
+    (dotimes [i cnt]
+      (aset vs i 
+        (v3+ (.position (.transform o))
+             (v3* (.forward (.transform o)) (* i (- step)))))
+      (aset rs i (.rotation (.transform o))))
+    [vs rs]))
 
 (defn start [o]
   (game.std/base-vr)
