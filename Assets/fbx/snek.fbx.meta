@@ -3,7 +3,7 @@ guid: 12caf9f84a5e653458aa3de580f4b762
 timeCreated: 1497725840
 licenseType: Free
 ModelImporter:
-  serializedVersion: 19
+  serializedVersion: 22
   fileIDToRecycleName:
     100000: front
     100002: front_end
@@ -12,6 +12,8 @@ ModelImporter:
     100008: //RootNode
     100010: snek-armature
     100012: snek-mesh
+    100014: snek-armature.001
+    100016: snek-mesh.001
     400000: front
     400002: front_end
     400004: rear
@@ -19,13 +21,25 @@ ModelImporter:
     400008: //RootNode
     400010: snek-armature
     400012: snek-mesh
+    400014: snek-armature.001
+    400016: snek-mesh.001
     4300000: snek-mesh
+    4300002: snek-mesh.001
     9500000: //RootNode
     13700000: snek-mesh
+    13700002: snek-mesh.001
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: VERTEX
+    second: {fileID: 2100000, guid: 7ef662300fd470147b114c23a5afc5a6, type: 2}
   materials:
     importMaterials: 1
+    autoMapExternalMaterials: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -38,12 +52,14 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations: []
     isReadable: 1
   meshes:
@@ -51,7 +67,10 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -67,6 +86,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:

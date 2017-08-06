@@ -135,9 +135,9 @@
     (reset! DS ds))
   (clone! :sun)
   (clone! :grid)
-  (reset! snek-cnt 20)
+  (reset! snek-cnt 60)
   (reset! head (clone! :snek/snek-head))
-  (reset! segments (into-array UnityEngine.GameObject (for [_ (range 100)]  (clone! :snek/bonesnek))))
+  (reset! segments (into-array UnityEngine.GameObject (for [_ (range 500)]  (clone! :snek/bonesnek))))
   (reset! bones 
     (into-array UnityEngine.Transform|[]| 
       (map #(into-array UnityEngine.Transform (first (.transform %))) @segments)))
