@@ -20,6 +20,7 @@
 (def shift (atom false))
 
 (defn text [o] (.text (child-component o UnityEngine.TextMesh)))
+(defn key-text! [o s] (set! (.text (child-component o UnityEngine.TextMesh)) s))
 
 (deftween [:text :color] [this]
   {:base (.GetComponent this UnityEngine.TextMesh)
@@ -36,7 +37,6 @@
   (text! (the repl) (parse (str (state o :text)))))
 
 (defn topogolize-cursor [n s]
-  (log [n s])
   (let [split-lines (string/split s #"\n")]
     (loop [n n y 0 lines split-lines]
       (if (or (empty? lines) 
@@ -55,6 +55,7 @@
 
 (defn eval-repl [o]
   (timeline*
+    (wait 0)
     #(do 
       (let [form (state o :text)
             {:keys [result env]} (arcadia.repl/repl-eval-print @repl-env form)]
@@ -76,10 +77,11 @@
   (update-cursor o))
 
 (defn toggle-shift [down]
+  (log "shift")
   (reset! shift down)
   (if down
-    (dorun (map #(text! % (str (state % :shift-key))) (every key)))
-    (dorun (map #(text! % (str (state % :key))) (every key)))))
+    (dorun (map #(key-text! % (str (state % :shift-key))) (every key)))
+    (dorun (map #(key-text! % (str (state % :key))) (every key)))))
 
 
 (defn mallet-enter [o c]

@@ -1,0 +1,169 @@
+fileFormatVersion: 2
+guid: 8af0a71d8f915854b9f2946c4c24d567
+timeCreated: 1501908156
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: rear
+    100004: rear.001
+    100006: rear.001_end
+    100008: rear.002
+    100010: rear.002_end
+    100012: rear.003
+    100014: rear.003_end
+    100016: rear.004
+    100018: rear.004_end
+    100020: rear.005
+    100022: rear.005_end
+    100024: rear_end
+    100026: snek-armature
+    100028: snek-mesh
+    100030: Camera
+    100032: front
+    100034: front 1
+    100036: front_end
+    100038: front_end 1
+    100040: Lamp
+    100042: rear 1
+    100044: rear 2
+    100046: rear_end 1
+    100048: rear_end 2
+    100050: snek-armature.001
+    100052: snek-armature.002
+    100054: snek-mesh.001
+    100056: Sphere
+    100058: tail-mesh
+    100060: tube
+    100062: snek-body
+    400000: //RootNode
+    400002: rear
+    400004: rear.001
+    400006: rear.001_end
+    400008: rear.002
+    400010: rear.002_end
+    400012: rear.003
+    400014: rear.003_end
+    400016: rear.004
+    400018: rear.004_end
+    400020: rear.005
+    400022: rear.005_end
+    400024: rear_end
+    400026: snek-armature
+    400028: snek-mesh
+    400030: Camera
+    400032: front
+    400034: front 1
+    400036: front_end
+    400038: front_end 1
+    400040: Lamp
+    400042: rear 1
+    400044: rear 2
+    400046: rear_end 1
+    400048: rear_end 2
+    400050: snek-armature.001
+    400052: snek-armature.002
+    400054: snek-mesh.001
+    400056: Sphere
+    400058: tail-mesh
+    400060: tube
+    400062: snek-body
+    2000000: Camera
+    2100000: VERTEX
+    2100002: No Name
+    2300000: Sphere
+    2300002: tube
+    3300000: Sphere
+    3300002: tube
+    4300000: snek-mesh
+    4300002: tube
+    4300004: Sphere
+    4300006: tail-mesh
+    4300008: snek-mesh.001
+    4300010: snek-body
+    9500000: //RootNode
+    10800000: Lamp
+    13700000: snek-mesh
+    13700002: snek-mesh.001
+    13700004: tail-mesh
+    13700006: snek-body
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    autoMapExternalMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

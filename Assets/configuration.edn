@@ -1,0 +1,7 @@
+{ :arcadia.compiler/loadpaths [
+    "Assets/magic"
+    "Assets/mage"
+    "Assets/tools.analyzer/src"
+    "Assets/test.check/clojure"]
+   :socket-repl true
+  }

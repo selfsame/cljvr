@@ -8,38 +8,21 @@
     tween.core
     game.vr
     game.std)
-  (:import [UnityEngine GameObject Quaternion Space Mathf Mesh Vector3]
+  (:require
+    [magic.api :as m])
+  (:import [UnityEngine GameObject Transform Quaternion Space Mathf Mesh Vector3]
     Curve [Hard Helper]
     Snek))
 
 (declare start)
 
-(defn mesh! [o m] (set! (.mesh (.GetComponent o UnityEngine.MeshFilter)) m))
-(defn shared-mesh! [o m] (set! (.sharedMesh (.GetComponent o UnityEngine.MeshFilter)) m))
-
 (def snek-cnt (atom 7))
 (defonce VS (atom nil))
 (defonce DS (atom nil))
 (defonce head (atom nil))
-(defonce tail (atom nil))
 (defonce curve (atom nil))
-(def tubes (atom []))
-(def balls (atom []))
-(def raw-tube (atom nil))
-(defonce tempo (atom 0))
-
-'(* radius (.Evaluate (.curve (cmpt @curve Curve)) (float (/ % s))))
-
-(defn trip []
-  (let [background (clone! :empty)]
-    (dorun 
-      (for [i (range 1 #_(+ 2 (rand-int 3)) )]
-        (let [o (clone! :icosphere)
-              r (v3 (?f -0.06 0.06)(?f -0.06 0.06)(?f -0.06 0.06))] 
-          (parent! o background)
-          (gradiate o)
-          (timeline* #(rotate! o r)))))
-    (local-scale! background (v3 20))))
+(def segments (atom []))
+(def bones (atom nil))
 
 (defn prime-snek [o]
   (let [o (gobj o)
@@ -73,60 +56,70 @@
     (reset! DS rs)))
 
 
-(defn snek-gizmos [o]
-  #_(gizmo-color (color 0 1 1))
-      (gizmo-point (first @VS) 0.05)
-  #_(reduce 
-    (fn [a b]
-      (gizmo-color (color 1 0 1))
-      (gizmo-point b 0.015)
-      (gizmo-color (color 0 1 1))
-      (gizmo-line a b) b)
-    @VS) )
+(defn place-segment [offset ^UnityEngine.Transform|[]| bones vs ds] ;^int offset  ^Vector3|[]| vs  ^Quaternion|[]| ds
+  (let [offset-idx (- (* offset 6) offset)
+        last-idx (dec (count vs))
+        ^UnityEngine.AnimationCurve curve @curve]
+    (dotimes [i 6]
+      (let [snake-idx       (Mathf/Min (+ (* i 2) offset-idx) last-idx)
+            ^Transform bone (aget bones i)
+            ^Vector3    v   (Hard.Helper/Aget vs snake-idx)
+            ^Quaternion d   (Hard.Helper/Aget ds snake-idx)
+            radius (.Evaluate curve (float (- 1.0 (/ snake-idx (.Length vs)))))]
+        (set! (.position bone) v)
+        (set! (.rotation bone) d)
+        (set! (.localScale bone) (v3 radius)) ))))
 
 
-(def ^System.Int64 tube-segments 10)
-(def ^System.Int64 segment-verts 12)
+(m/defn ^System.Single curve-eval [^UnityEngine.AnimationCurve curve ^System.Double n]
+  (.Evaluate curve n))
 
-(defn place-tube [offset tube vs ds]
-  (let [verts (vertices @raw-tube)
-        offset-idx (- (* offset tube-segments) offset)
-        last-idx (- (.Length vs) 1)
-        ^UnityEngine.AnimationCurve curve (.curve (cmpt @curve Curve))]
-    (dotimes [i tube-segments]
-      (let [snake-idx (Mathf/Min (+ (* i 2) offset-idx) last-idx)
-            ^Vector3 v (Hard.Helper/Aget vs snake-idx)
-            ^Quaternion d (Hard.Helper/Aget ds snake-idx)
-            radius (* 0.05 (.Evaluate curve (float (- 1.0 (/ snake-idx (.Length vs))))))]
-      (dotimes [j segment-verts]
-        (let [^System.Int64 idx (+ (* (- 9 i) 12) j)]
-          (aset verts idx 
-            (v3+ v (v3* (q* d (Hard.Helper/Aget verts idx)) radius)) )))))
-    (vertices! tube verts)
-    (.RecalculateNormals (.mesh (.GetComponent tube UnityEngine.MeshFilter)))))
+(m/defn ^System.Double bad-math [^System.Single a ^System.Int32 b]
+  (- 1.0 (/ a b)))
+
+(m/defn place-bone [
+    ^UnityEngine.Transform|[]| bones 
+    ^UnityEngine.Vector3|[]| vs 
+    ^UnityEngine.Quaternion|[]| ds 
+    ^int i ^int offset-idx ^int last-idx 
+    ^UnityEngine.AnimationCurve curve]
+  (let [^System.Single snake-idx       (Mathf/Min (+ (* i 2) offset-idx) last-idx)
+        ^Transform bone (aget bones i)
+        ^Vector3    v   (aget vs snake-idx)
+        ^Quaternion d   (aget ds snake-idx)
+        ^System.Single radius (.Evaluate curve (bad-math snake-idx (.-Length vs)))]
+    (set! (.position bone) v)
+    (set! (.rotation bone) d)
+    (set! (.localScale bone) (v3 radius)) ))
+
+(m/defn place-segment [
+  ^int offset 
+  ^UnityEngine.Transform|[]| bones 
+  ^UnityEngine.Vector3|[]| vs 
+  ^UnityEngine.Quaternion|[]| ds]
+  (let [^int offset-idx (- (* offset 6) offset)
+        ^int last-idx (dec (count vs))
+        ^UnityEngine.AnimationCurve curve @curve
+        f place-bone]
+    (dotimes [i 6]
+      (f bones vs ds i offset-idx last-idx curve))))
+
+
+
 
 (defn tubesnek [] 
   (let [vs @VS
         ds @DS
-        spacer 10
-        cnt (int (Mathf/Ceil (/ (count vs) 18)))
-        ]
-    (dotimes [i (count vs)]
-      (if (= (Hard.Helper/Mod i spacer) 0)
-        (if-let [ball (get @balls (int (/ i spacer)))]
-          (position! ball (get vs i)))))
+        cnt (Mathf/Ceil (* (count vs) 0.1666666))]
     (dotimes [i cnt]
-      (place-tube (* i 2) (get @tubes i) vs ds)
-      ;(Snek/PlaceTube (* i tube-segments) @raw-tube (get @tubes i) vs ds)
-      )
+      (place-segment (* i 2) (aget @bones i) vs ds))
     true))
 
 (defn place-snake [n]
   (let []
-    (position! @head (first @VS))
-    (rotation! @head (first @DS))
-    (tubesnek)
-    ))
+    (position! @head (aget @VS 0))
+    (rotation! @head (aget @DS 0))
+    (tubesnek)))
 
 (defn apple! []
   (let [apple (clone! :snek/apple (v3 (?f -1 1)(?f -1 1)(?f -1 1)))
@@ -136,10 +129,7 @@
 (defn update-game [o]
   (let [ro (gobj (right))]
     (inc-snek)
-    (place-snake nil)
-    ))
-
-
+    (place-snake nil)))
 
 (defn grow-snek []
   (swap! snek-cnt inc))
@@ -151,15 +141,8 @@
               (apple!)
               (destroy thing))
           (= (.name thing) "ball")
-          (if (every? #(not= % thing) (take 4 @balls))
-              (start nil))
-
-          )))
-
-(defn tube! []
-  (let [tube (clone! :snek/tube)]
-    (material-color! tube (color 0.2745 0.6901 0.2196))
-    tube))
+          (if true;(every? #(not= % thing) (take 4 @balls))
+              (start nil)) )))
 
 (defn start [o]
   (game.std/base-vr)
@@ -168,26 +151,24 @@
     (reset! DS ds))
   (clone! :sun)
   (clone! :grid)
-  (trip)
   (reset! snek-cnt 20)
   (reset! head (clone! :snek/snek-head))
-  (reset! tubes (vec (for [_ (range 100)]  (tube!))))
-  (reset! balls (vec (for [_ (range 100)] (clone! :snek/ball))))
-  (reset! raw-tube (clone! :snek/tube))
-  (reset! curve (clone! :snek/curve))
+  (reset! segments (into-array UnityEngine.GameObject (for [_ (range 100)]  (clone! :snek/bonesnek))))
+  (reset! bones 
+    (into-array UnityEngine.Transform|[]| 
+      (map #(into-array UnityEngine.Transform (first (.transform %))) @segments)))
+  (reset! curve (.-curve (cmpt (clone! :snek/curve) Curve)))
   
   (timeline* 
     (wait 0.2)
     #(do (hook+ @head :on-trigger-enter #'snek-hit) nil))
   (dotimes [i 10] (apple!))
   (let [session? (clone! :empty)]
-    (hook+ session? :update #'update-game)
-    (hook+ session? :on-draw-gizmos #'snek-gizmos))
+    (hook+ session? :update #'update-game))
   (on-hand (right) (clone! :snek/minisnake)))
 
+
 (start nil)
-
-
 
 '(clear-cloned!)
 
